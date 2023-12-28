@@ -1,4 +1,11 @@
 <?php
+/**
+ *   ABF 2023
+ *  clase paciente, contiene los datos esenciales de una paciente
+ * 
+ */
+
+
 class Paciente {
     private $id;
     private $nombre;
