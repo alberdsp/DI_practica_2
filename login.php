@@ -48,7 +48,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Devolver el token al usuario
-     echo json_encode(['remember_token' => $user['remember_token']]);
+     echo json_encode(['token' => $user['remember_token']]);
    
     
 } else {
