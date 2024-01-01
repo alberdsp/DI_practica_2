@@ -12,7 +12,7 @@
  */
 
 include 'config.php';
-include 'User.php';
+include 'models/User.php';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

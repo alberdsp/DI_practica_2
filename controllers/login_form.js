@@ -42,7 +42,7 @@
                 // almacenamos el token en variable de sesion
                 sessionStorage.setItem('token_hospital_gest', data.token);
                 document.getElementById('message').textContent = 'Acceso permitido';
-                window.location.href = 'listado.php'; // Redirecciona a listado.php
+                window.location.href = 'citas_list.html'; // Redirecciona a listado.php
                 
 
             } else {
