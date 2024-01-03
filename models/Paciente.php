@@ -5,21 +5,22 @@
  * Clase Paciente, contiene los datos esenciales de un paciente.
  */
 
-class Paciente
-{
-    private $id;
-    private $nombre;
-    private $edad;
-    private $genero;
+ class Paciente {
+    public $sip;
+    public $dni;
+    public $nombre;
+    public $apellido1;
 
     // Constructor
-    function __construct($id = null, $nombre = null, $edad = null, $genero = null)
-    {
-        $this->id = $id;
-        $this->nombre = $nombre;
-        $this->edad = $edad;
-        $this->genero = $genero;
+    function __construct($sip = null, $dni = null, $nombre = null, $apellido1 = null) {
+        if (func_num_args() > 0) {
+            $this->sip = $sip;
+            $this->dni = $dni;
+            $this->nombre = $nombre;
+            $this->apellido1 = $apellido1;
+        }
     }
+    
 
     // Método mágico GET
     public function __get($property)
@@ -41,11 +42,10 @@ class Paciente
     // Métodos para el manejo de la base de datos
 
     // Obtener pacientes de la base de datos con filtros
-    public static function obtenerPacientes($pdo, $filtros = [])
-    {
-        $sql = "SELECT * FROM pacientes";
+    public static function obtenerPacientes($pdo, $filtros = []) {
+        $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
         $parametros = [];
-
+    
         if (!empty($filtros)) {
             $clausulas = [];
             foreach ($filtros as $campo => $valor) {
@@ -54,11 +54,15 @@ class Paciente
             }
             $sql .= " WHERE " . implode(' AND ', $clausulas);
         }
-
+    
         $stmt = $pdo->prepare($sql);
         $stmt->execute($parametros);
+     //   $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);   
+
+     //    var_export($resultados);
         return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
     }
+    
 
     // Insertar nuevo paciente en la base de datos
     public function insertar($pdo)
@@ -104,6 +108,6 @@ class Paciente
     public static function fromJson($jsonString)
     {
         $data = json_decode($jsonString, true);
-        return new self($data['id'], $data['nombre'], $data['edad'], $data['genero']);
+        return new self($data['sip'], $data['dni'], $data['nombre'], $data['apellido1']);
     }
 }

@@ -1,7 +1,21 @@
 <!doctype html>
+
 <html lang="es" data-bs-theme="auto">
 
+<?php
+
+$sip = '';
+$dni = '';
+$nombre = '';
+$apellido1 = '';
+
+?>
+
+
 <head>
+    
+        
+
     <script src="vendor/js/color-modes.js"></script>
 
     <meta charset="utf-8">
@@ -70,8 +84,22 @@
 
         <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
 
+
+             <!-- formulario de filtros  -->
+
             <div class="lh-1">
-                <h1 class="h6 mb-0 text-white lh-1">Filtros</h1>
+               
+                <form id='filtroForm' class="form">
+                    <label for="sip">SIP:</label>
+                    <input type="text" id="sip" name="sip" value="">
+                    <label for="dni">Dni:</label>
+                    <input type="text" id="dni" name="dni" value="">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" value="">
+                    <label for="apellido1">Apellido1:</label>
+                    <input type="text" id="apellido1" name="apellido1" value=""> 
+                    <button type="submit">Buscar</button>
+                </form>
 
             </div>
         </div>
@@ -80,35 +108,11 @@
 
             <!-- Nombre del listado  -->
             <h6 class="border-bottom pb-2 mb-0">Listado de pacientes</h6>
-            <div class="d-flex text-body-secondary pt-3">
-                <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-                    <div class="d-flex justify-content-between">
-                        <strong class="text-gray-dark">Full Name</strong>
-                        <a href="#">Follow</a>
-                    </div>
-                    <span class="d-block"></span>
-                </div>
+            <div id='lista_pacientes'class="d-flex text-body-secondary pt-3">
+              
             </div>
 
-            <div class="d-flex text-body-secondary pt-3">
-                <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-                    <div class="d-flex justify-content-between">
-                        <strong class="text-gray-dark">Full Name</strong>
-                        <a href="#">Follow</a>
-                    </div>
-                    <span class="d-block"></span>
-                </div>
-            </div>
-
-            <div class="d-flex text-body-secondary pt-3">
-                <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-                    <div class="d-flex justify-content-between">
-                        <strong class="text-gray-dark">Full Name</strong>
-                        <a href="#">Follow</a>
-                    </div>
-                    <span class="d-block"></span>
-                </div>
-            </div>
+         
 
 
             <small class="d-block text-end mt-3">
@@ -119,6 +123,7 @@
     <script src="vendor/js/bootstrap.bundle.min.js"></script>
 
     <script src="vendor/js/offcanvas-navbar.js"></script>
+    <script src="controllers/pacientes_list.js"></script>
 </body>
 
 
