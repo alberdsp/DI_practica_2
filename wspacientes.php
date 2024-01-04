@@ -66,7 +66,7 @@ if (isset($headers["Authorization"])) {
 
 
 
-// echo "<script>console.log('token recibido del navegador:' . $token . 'mediante' . $method .);</script>";
+
 
 
 

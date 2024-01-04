@@ -57,9 +57,9 @@
     
         $stmt = $pdo->prepare($sql);
         $stmt->execute($parametros);
-     //   $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);   
+   
 
-     //    var_export($resultados);
+    
         return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
     }
     
