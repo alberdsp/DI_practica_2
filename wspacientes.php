@@ -107,9 +107,27 @@ try {
 
             break;
 
-        case 'DELETE':
-            $data = json_decode(file_get_contents('php://input'), true);
+            case 'DELETE':
+                $data = json_decode(file_get_contents('php://input'), true);
+            
+                if (isset($data['dni'])) {
+                    $resultado = Paciente::eliminar($pdo, $data['dni']);
 
+
+                    echo (" recibido dni" . $data['dni']);
+                    if ($resultado) {
+                        http_response_code(200);
+                        echo json_encode(['success' => 'Paciente eliminado con éxito']);
+                    } else {
+                        http_response_code(400);
+                        echo json_encode(['error' => 'No se pudo eliminar al paciente']);
+                    }
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'DNI no proporcionado']);
+                }
+                break;
+            
 
         default:
             http_response_code(405);
@@ -120,4 +138,6 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Error interno del servidor']);
 }
+
+
 }

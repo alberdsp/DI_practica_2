@@ -79,37 +79,115 @@ function filtrarYPrepararDatos(objetoFiltros) {
     return filtrosConValor;
 }
 
-
 function mostrarPacientes(respuesta) {
     const contenedor = document.getElementById('lista_pacientes');
     contenedor.innerHTML = ''; // Limpiar el contenedor actual
 
-    // comprobamos que viene array
+    // Crear la tabla
+    const tabla = document.createElement('table');
+    tabla.classList.add('table');
+
     if (respuesta && Array.isArray(respuesta.data)) {
-        const pacienteDiv = document.createElement('div');
-        pacienteDiv.classList.add('row', 'mb-3'); 
-        const pacienteColumn = document.createElement('div');
-          
-            pacienteColumn.classList.add('col');
-            pacienteDiv.appendChild(pacienteColumn);
-
         respuesta.data.forEach(paciente => {
-            const pacienteBloq = document.createElement('span')
-            pacienteBloq.classList.add('d-block');
-            
+            // Crear una fila para cada paciente
+            const fila = document.createElement('tr');
+
+            // Crear y añadir celdas para los detalles del paciente
+            fila.appendChild(crearCelda(paciente.sip));
+            fila.appendChild(crearCelda(paciente.dni));
+            fila.appendChild(crearCelda(paciente.nombre));
+            fila.appendChild(crearCelda(paciente.apellido1));
+
+            // Crear celda para los botones
+            const celdaBotones = document.createElement('td');
+
+            // Botón de editar
+            const botonEditar = crearBoton('Editar', 'btn-primary', () => editarPaciente(paciente));
+            celdaBotones.appendChild(botonEditar);
+
            
-            const pacienteDetails = document.createElement('p');
-            pacienteDetails.innerHTML = `${paciente.sip}        ${paciente.dni}           ${paciente.nombre}          ${paciente.apellido1}`;
 
-            pacienteColumn.appendChild(pacienteDetails);
-            contenedor.appendChild(pacienteDiv);
-            contenedor.appendChild(pacienteBloq);
+             // Botón de borrar
+             const botonBorrar = document.createElement('button');
+             botonBorrar.innerText = 'Borrar';
+             botonBorrar.classList.add('btn', 'btn-danger', 'mr-2');
+             botonBorrar.setAttribute('data-dni', paciente.dni);
+             botonBorrar.onclick = function() {
+                 borrarPaciente(this.getAttribute('data-dni'));
+             };
 
-        });
 
+           celdaBotones.appendChild(botonBorrar);
+
+            // Añadir la celda de botones a la fila
+            fila.appendChild(celdaBotones);
+           
+             // Añadir la fila a la tabla con un margen adicional
+            fila.classList.add('fila-paciente');
         
+            // Añadir la fila a la tabla
+            tabla.appendChild(fila);
+        });
+        // Añadir la tabla al contenedor
+        contenedor.appendChild(tabla);
     } else {
         console.error('Se esperaba un objeto con una propiedad "data" que es un array, pero se recibió:', respuesta);
         contenedor.innerText = 'No se pudieron cargar los datos de los pacientes.';
     }
 }
+
+function crearCelda(texto) {
+    const celda = document.createElement('td');
+    celda.textContent = texto;
+    return celda;
+}
+
+function crearBoton(texto, clases, onClick) {
+    const boton = document.createElement('button');
+    boton.textContent = texto;
+    boton.classList.add('btn', clases, 'mr-2'); // Añadido margen derecho
+    boton.onclick = onClick;
+    return boton;
+}
+
+function editarPaciente(paciente) {
+    console.log("Editar paciente", paciente);
+    // Aquí iría el código para manejar la edición del paciente
+}
+
+
+
+// borrar paciente
+function borrarPaciente(dni) {
+    let token = sessionStorage.getItem('token_hospital_gest');
+
+    if (!confirm('¿Estás seguro de que quieres borrar al paciente con DNI ' + dni + '?')) {
+        return; // Si el usuario no confirma, no hacer nada
+    }
+
+    // Configuración de la petición
+    fetch('wspacientes.php', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token  // Token real aquí
+        },
+        body: JSON.stringify({ dni: dni }) // enviar acción y DNI en el cuerpo
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+        return response.json(); // o response.text() si el servidor responde con texto
+    })
+    .then(data => {
+        console.log('Paciente borrado:', data);
+        // Aquí puedes añadir código para actualizar la interfaz de usuario, como quitar la fila de la tabla
+    })
+    .catch(error => {
+        console.error('Error al borrar paciente:', error);
+        // Manejo de errores, como mostrar un mensaje al usuario
+    });
+}
+
+

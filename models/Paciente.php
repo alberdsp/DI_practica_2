@@ -85,18 +85,17 @@
         return $stmt->execute([$this->nombre, $this->edad, $this->genero, $this->id]);
     }
 
-    // Eliminar paciente de la base de datos
-    public function eliminar($pdo)
-    {
-        if (empty($this->id)) {
-            throw new Exception("El ID es obligatorio para eliminar.");
-        }
-
-        $sql = "DELETE FROM pacientes WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        return $stmt->execute([$this->id]);
+    public static function eliminar($pdo, $dni) {
+   
+     
+            // Eliminar el paciente
+            $sql = "DELETE FROM pacientes WHERE dni = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$dni]);
+            return $stmt->execute([$dni]);
+       
     }
-
+    
 
     // Convertir objeto a JSON
     public function toJson()
