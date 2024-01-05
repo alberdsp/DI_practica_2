@@ -85,15 +85,59 @@
         return $stmt->execute([$this->nombre, $this->edad, $this->genero, $this->id]);
     }
 
+
+    // función para eliminar paciente y todas sus foreing keys
     public static function eliminar($pdo, $dni) {
-   
-     
-            // Eliminar el paciente
-            $sql = "DELETE FROM pacientes WHERE dni = ?";
+        if (empty($dni)) {
+            throw new Exception("El dni es obligatorio para borrar.");
+        }
+    
+        // preparamos la transacción
+        $pdo->beginTransaction();
+    
+        try {
+            // consultamos el id del paciente 
+            $sql = "SELECT id FROM pacientes WHERE dni = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$dni]);
-            return $stmt->execute([$dni]);
-       
+            $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if ($paciente) {
+                // obtenemos id de paciente
+                $sql = "SELECT id FROM citas WHERE paciente_id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$paciente['id']]);
+                $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+                foreach ($citas as $cita) {
+                    // borramos los tratamientos de cada cita del paciente
+                    $sql = "DELETE FROM tratamientos WHERE cita_id = ?";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute([$cita['id']]);
+                }
+    
+                // borramos las citas del paciente
+                $sql = "DELETE FROM citas WHERE paciente_id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$paciente['id']]);
+    
+                // borramos al paciente
+                $sql = "DELETE FROM pacientes WHERE dni = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$dni]);
+    
+                // realizamos la transacción
+                $pdo->commit();
+    
+                return true;
+            } else {
+                throw new Exception("No se encontró al paciente con el DNI proporcionado.");
+            }
+        } catch (Exception $e) {
+            // ocurrió error, hacemos roll back de la transacción
+            $pdo->rollBack();
+            throw $e;
+        }
     }
     
 

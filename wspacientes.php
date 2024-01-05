@@ -46,16 +46,10 @@ if (isset($headers["Authorization"])) {
             http_response_code(401);
             echo json_encode(['error' => 'Acceso no autorizado']);
             exit();
+        } else {
 
-        }else{
-
-           $autenticado = true;
-
+            $autenticado = true;
         }
-
-
-
-
     } else {
         echo "Formato de encabezado de autorización inválido.";
     }
@@ -72,72 +66,73 @@ if (isset($headers["Authorization"])) {
 
 // si autenticamos 
 
-if($autenticado){
+if ($autenticado) {
 
 
 
 
-try {
-    switch ($method) {
-        case 'POST':
-            $data = json_decode(file_get_contents('php://input'), true);
-
-            $pacientes = Paciente::obtenerPacientes($pdo, $data);
-             
-            // Preparar los datos para la respuesta JSON
-            $respuesta = [];
-            foreach ($pacientes as $paciente) {
-                $respuesta[] = [
-                    'sip' => isset($paciente->sip) ? $paciente->sip : null ,
-                    'dni' => isset($paciente->dni) ? $paciente->dni : null,
-                    'nombre' => isset($paciente->nombre) ? $paciente->nombre : null,
-                    'apellido1' => isset($paciente->apellido1) ? $paciente->apellido1 : null
-                ];
-            }
-            
-        
-            echo json_encode(['data' => $respuesta]);
-            break;
-        
-            
-
-        case 'PUT':
-            $data = json_decode(file_get_contents('php://input'), true);
-
-
-            break;
-
-            case 'DELETE':
+    try {
+        switch ($method) {
+            case 'POST':
                 $data = json_decode(file_get_contents('php://input'), true);
-            
-                if (isset($data['dni'])) {
-                    $resultado = Paciente::eliminar($pdo, $data['dni']);
+
+                $pacientes = Paciente::obtenerPacientes($pdo, $data);
+
+                // Preparar los datos para la respuesta JSON
+                $respuesta = [];
+                foreach ($pacientes as $paciente) {
+                    $respuesta[] = [
+                        'sip' => isset($paciente->sip) ? $paciente->sip : null,
+                        'dni' => isset($paciente->dni) ? $paciente->dni : null,
+                        'nombre' => isset($paciente->nombre) ? $paciente->nombre : null,
+                        'apellido1' => isset($paciente->apellido1) ? $paciente->apellido1 : null
+                    ];
+                }
 
 
-                    echo (" recibido dni" . $data['dni']);
-                    if ($resultado) {
-                        http_response_code(200);
-                        echo json_encode(['success' => 'Paciente eliminado con éxito']);
+                echo json_encode(['data' => $respuesta]);
+                break;
+
+
+
+            case 'PUT':
+                $data = json_decode(file_get_contents('php://input'), true);
+
+
+                break;
+
+                case 'DELETE':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                
+                    if (isset($data['dni'])) {
+                        try {
+                            $resultado = Paciente::eliminar($pdo, $data['dni']);
+                
+                            if ($resultado) {
+                                http_response_code(200);
+                                echo json_encode(['success' => 'Paciente eliminado con éxito']);
+                            } else {
+                                http_response_code(400);
+                                echo json_encode(['error' => 'No se pudo eliminar al paciente']);
+                            }
+                        } catch (Exception $e) {
+                            http_response_code(500);
+                            echo json_encode(['error' => 'Error del servidor: ' . $e->getMessage()]);
+                        }
                     } else {
                         http_response_code(400);
-                        echo json_encode(['error' => 'No se pudo eliminar al paciente']);
+                        echo json_encode(['error' => 'DNI no proporcionado']);
                     }
-                } else {
-                    http_response_code(400);
-                    echo json_encode(['error' => 'DNI no proporcionado']);
-                }
+                    break;
+
+
+            default:
+                http_response_code(405);
+                echo json_encode(['error' => 'Método no soportado']);
                 break;
-            
-
-        default:
-            http_response_code(405);
-            echo json_encode(['error' => 'Método no soportado']);
-            break;
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Error interno del servidor']);
     }
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error interno del servidor']);
-}
-
-
 }
