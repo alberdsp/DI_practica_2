@@ -41,8 +41,10 @@
 
     // Métodos para el manejo de la base de datos
 
+
+    //TODO A FALTA DE ESTABLECER COMO PASAR LOS PARÁMETROS
     // Obtener pacientes de la base de datos con filtros
-    public static function obtenerPacientes($pdo, $filtros = []) {
+    public static function obtenerPacientes($pdo, $filtros = [], $limit = 10, $offset = 0) {
         $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
         $parametros = [];
     
@@ -55,10 +57,13 @@
             $sql .= " WHERE " . implode(' AND ', $clausulas);
         }
     
+        // Add the LIMIT and OFFSET clauses to the SQL query
+        $sql .= " LIMIT ? OFFSET ?";
+        $parametros[] = $limit;
+        $parametros[] = $offset;
+    
         $stmt = $pdo->prepare($sql);
         $stmt->execute($parametros);
-   
-
     
         return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
     }
