@@ -11,7 +11,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtroForm').addEventListener('submit', (event) => {
         event.preventDefault();
-        mostrarToken();
+
         realizarBusqueda();
     });
 });
@@ -61,6 +61,38 @@ function realizarBusqueda() {
         })
         .catch(error => console.error('Error:', error));
 }
+
+
+// función para buscar paciente por dni
+function buscarPaciente(dni) {
+    // Captura del token de la sesión
+    let token = sessionStorage.getItem('token_hospital_gest');
+
+    // Solicitud Fetch al servidor
+
+    fetch('./wspacientes.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token  // Token real aquí
+        },
+        body: JSON.stringify({ dni: dni })
+    })
+        .then(response => {
+            if (response.headers.get("content-type").includes("application/json")) {
+                return response.json();
+            } else {
+                return response.text().then(text => { throw new Error(text) });
+            }
+
+        })
+        .then(data => {
+            console.log(data); // Imprimir para depuración
+            mostrarPacientes(data);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
 
 
 
@@ -157,10 +189,69 @@ function crearBoton(texto, clases, onClick) {
 }
 
 function editarPaciente(dni) {
-    // Redirect to the editar.html page with the dni as a query parameter
-    window.location.href = 'editar.html?dni=' + dni;
-}
+    let token = sessionStorage.getItem('token_hospital_gest');
 
+    fetch('wspacientes.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ dni: dni })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Paciente EDITADO:', data);
+
+            // Rellenamos el formulario con los datos del paciente
+            document.getElementById('sip').value = data.data[0]['sip'];
+            document.getElementById('dni').value = data.data[0]['dni'];
+            document.getElementById('nombre').value = data.data[0]['nombre'];
+            document.getElementById('apellido1').value = data.data[0]['apellido1'];
+
+            // botón de guardar
+            let botonGuardar = document.createElement('button');
+            botonGuardar.id = 'botonGuardar'; // Assign the ID
+            botonGuardar.innerText = 'Guardar';
+            botonGuardar.classList.add('btn', 'btn-primary', 'mr-2');
+            botonGuardar.onclick = function () {
+                let sip = document.getElementById('sip').value;
+                let dni = document.getElementById('dni').value;
+                let nombre = document.getElementById('nombre').value;
+                let apellido1 = document.getElementById('apellido1').value;
+                guardarPaciente(dni, sip, nombre, apellido1);
+            };
+
+            // botón de cancelar
+            let botonCancelar = document.createElement('button');
+            botonCancelar.id = 'botonCancelar'; // Assign the ID
+            botonCancelar.innerText = 'Cancelar';
+            botonCancelar.classList.add('btn', 'btn-primary', 'mr-2');
+            botonCancelar.onclick = function () {
+                document.getElementById('filtroForm').reset();
+                realizarBusqueda();
+            };
+
+            // si el formulario no contiene el boton de guardar 
+            let botonGuardarActual = document.getElementById('botonGuardar');
+            let botonCancelarActual = document.getElementById('botonCancelar');
+            if (!(botonGuardarActual && botonCancelarActual)) {
+                // añadimos el boton de guardar al formulario
+                document.getElementById('filtroForm').appendChild(botonGuardar);
+                // añadimos el boton de cancelar al formulario
+                document.getElementById('filtroForm').appendChild(botonCancelar);
+            }
+
+        })
+        .catch(error => {
+            console.error('Error al editar paciente:', error);
+        });
+}
 
 // Guardar paciente
 function guardarPaciente(dni, sip, nombre, apellido1) {
