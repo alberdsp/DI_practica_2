@@ -41,33 +41,63 @@
 
     // Métodos para el manejo de la base de datos
 
+/*  funciona sin paginar
 
-    //TODO A FALTA DE ESTABLECER COMO PASAR LOS PARÁMETROS
-    // Obtener pacientes de la base de datos con filtros
-    public static function obtenerPacientes($pdo, $filtros = [], $limit = 10, $offset = 0) {
-        $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
-        $parametros = [];
-    
-        if (!empty($filtros)) {
-            $clausulas = [];
-            foreach ($filtros as $campo => $valor) {
-                $clausulas[] = "$campo = ?";
-                $parametros[] = $valor;
-            }
-            $sql .= " WHERE " . implode(' AND ', $clausulas);
+public static function obtenerPacientes($pdo, $filtros = []) {
+    $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
+    $parametros = [];
+
+    if (!empty($filtros)) {
+        $clausulas = [];
+        foreach ($filtros as $campo => $valor) {
+            $clausulas[] = "$campo = ?";
+            $parametros[] = $valor;
         }
-    
-        // Add the LIMIT and OFFSET clauses to the SQL query
-        $sql .= " LIMIT ? OFFSET ?";
-        $parametros[] = $limit;
-        $parametros[] = $offset;
-    
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($parametros);
-    
-        return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
+        $sql .= " WHERE " . implode(' AND ', $clausulas);
     }
-    
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($parametros);
+
+
+
+    return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
+}
+
+*/
+
+
+public static function obtenerPacientes($pdo, $filtros = [], $limit = 10, $offset = 0) {
+    $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
+    $parametros = [];
+
+    if (!empty($filtros)) {
+        $clausulas = [];
+        foreach ($filtros as $campo => $valor) {
+            $clausulas[] = "$campo = ?";
+            $parametros[] = $valor;
+        }
+        $sql .= " WHERE " . implode(' AND ', $clausulas);
+        $sql .= " LIMIT $limit OFFSET $offset";
+    }
+
+    // Add the LIMIT and OFFSET clauses to the SQL query
+   // $sql .= " LIMIT ? OFFSET ?";
+   // $parametros[] = $limit;
+  //  $parametros[] = $offset;
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($parametros);
+
+
+
+    return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
+}
+
+
+
+
+
 
     // Insertar nuevo paciente en la base de datos
     public function insertar($pdo)
@@ -145,6 +175,14 @@
         }
     }
     
+
+// localizar paciente para editar datos por dni
+    public static function obtenerPacientePorDni($pdo, $dni) {
+        $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes WHERE dni = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$dni]);
+        return $stmt->fetchObject('Paciente');
+    }
 
     // Convertir objeto a JSON
     public function toJson()

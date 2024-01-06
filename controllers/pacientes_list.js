@@ -37,7 +37,7 @@ function realizarBusqueda() {
     let filtros = {};
     formData.forEach((value, key) => { filtros[key] = value; });
 
-   // console.log(filtros); // Imprimir filtros para depuración
+    // console.log(filtros); // Imprimir filtros para depuración
 
     // Solicitud Fetch al servidor
     fetch('./wspacientes.php', {
@@ -48,18 +48,18 @@ function realizarBusqueda() {
         },
         body: JSON.stringify(filtrarYPrepararDatos(filtros))
     })
-    .then(response => {
-        if (response.headers.get("content-type").includes("application/json")) {
-            return response.json();
-        } else {
-            return response.text().then(text => { throw new Error(text) });
-        }
-    })
-    .then(data => {
-        console.log(data); // Imprimir para depuración
-        mostrarPacientes(data);
-    })
-    .catch(error => console.error('Error:', error));
+        .then(response => {
+            if (response.headers.get("content-type").includes("application/json")) {
+                return response.json();
+            } else {
+                return response.text().then(text => { throw new Error(text) });
+            }
+        })
+        .then(data => {
+            console.log(data); // Imprimir para depuración
+            mostrarPacientes(data);
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 
@@ -101,30 +101,36 @@ function mostrarPacientes(respuesta) {
             // Crear celda para los botones
             const celdaBotones = document.createElement('td');
 
-            // Botón de editar
-            const botonEditar = crearBoton('Editar', 'btn-primary', () => editarPaciente(paciente));
+            /// Botón de editar
+            const botonEditar = document.createElement('button');
+            botonEditar.innerText = 'Editar';
+            botonEditar.classList.add('btn', 'btn-primary', 'mr-2');
+            botonEditar.setAttribute('data-dni', paciente.dni);
+            botonEditar.onclick = function () {
+                editarPaciente(this.getAttribute('data-dni'));
+            };
+
             celdaBotones.appendChild(botonEditar);
 
-           
 
-             // Botón de borrar
-             const botonBorrar = document.createElement('button');
-             botonBorrar.innerText = 'Borrar';
-             botonBorrar.classList.add('btn', 'btn-danger', 'mr-2');
-             botonBorrar.setAttribute('data-dni', paciente.dni);
-             botonBorrar.onclick = function() {
-                 borrarPaciente(this.getAttribute('data-dni'));
-             };
+            // Botón de borrar
+            const botonBorrar = document.createElement('button');
+            botonBorrar.innerText = 'Borrar';
+            botonBorrar.classList.add('btn', 'btn-danger', 'mr-2');
+            botonBorrar.setAttribute('data-dni', paciente.dni);
+            botonBorrar.onclick = function () {
+                borrarPaciente(this.getAttribute('data-dni'));
+            };
 
 
-           celdaBotones.appendChild(botonBorrar);
+            celdaBotones.appendChild(botonBorrar);
 
             // Añadir la celda de botones a la fila
             fila.appendChild(celdaBotones);
-           
-             // Añadir la fila a la tabla con un margen adicional
+
+            // Añadir la fila a la tabla con un margen adicional
             fila.classList.add('fila-paciente');
-        
+
             // Añadir la fila a la tabla
             tabla.appendChild(fila);
         });
@@ -150,12 +156,40 @@ function crearBoton(texto, clases, onClick) {
     return boton;
 }
 
-function editarPaciente(paciente) {
-    console.log("Editar paciente", paciente);
-    // Aquí iría el código para manejar la edición del paciente
+function editarPaciente(dni) {
+    // Redirect to the editar.html page with the dni as a query parameter
+    window.location.href = 'editar.html?dni=' + dni;
 }
 
 
+// Guardar paciente
+function guardarPaciente(dni, sip, nombre, apellido1) {
+    let token = sessionStorage.getItem('token_hospital_gest');
+
+    // Configuración de la petición
+    fetch('wspacientes.php', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token  // Token real aquí
+        },
+        body: JSON.stringify({ dni: dni, sip: sip, nombre: nombre, apellido1: apellido1 }) // enviar los nuevos detalles del paciente en el cuerpo
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json(); // o response.text() si el servidor responde con texto
+        })
+        .then(data => {
+            console.log('Paciente editado:', data);
+            // Aquí puedes añadir código para actualizar la interfaz de usuario, como actualizar la fila de la tabla
+        })
+        .catch(error => {
+            console.error('Error al editar paciente:', error);
+            // Manejo de errores, como mostrar un mensaje al usuario
+        });
+}
 
 // borrar paciente
 function borrarPaciente(dni) {
@@ -174,20 +208,20 @@ function borrarPaciente(dni) {
         },
         body: JSON.stringify({ dni: dni }) // enviar acción y DNI en el cuerpo
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
-        return response.json(); // o response.text() si el servidor responde con texto
-    })
-    .then(data => {
-        console.log('Paciente borrado:', data);
-        // Aquí puedes añadir código para actualizar la interfaz de usuario, como quitar la fila de la tabla
-    })
-    .catch(error => {
-        console.error('Error al borrar paciente:', error);
-        // Manejo de errores, como mostrar un mensaje al usuario
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json(); // o response.text() si el servidor responde con texto
+        })
+        .then(data => {
+            console.log('Paciente borrado:', data);
+            // Aquí puedes añadir código para actualizar la interfaz de usuario, como quitar la fila de la tabla
+        })
+        .catch(error => {
+            console.error('Error al borrar paciente:', error);
+            // Manejo de errores, como mostrar un mensaje al usuario
+        });
 }
 
 

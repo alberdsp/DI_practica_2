@@ -60,10 +60,6 @@ if (isset($headers["Authorization"])) {
 
 
 
-
-
-
-
 // si autenticamos 
 
 if ($autenticado) {
@@ -101,29 +97,23 @@ if ($autenticado) {
 
                 break;
 
-                case 'DELETE':
-                    $data = json_decode(file_get_contents('php://input'), true);
-                
-                    if (isset($data['dni'])) {
-                        try {
-                            $resultado = Paciente::eliminar($pdo, $data['dni']);
-                
-                            if ($resultado) {
-                                http_response_code(200);
-                                echo json_encode(['success' => 'Paciente eliminado con éxito']);
-                            } else {
-                                http_response_code(400);
-                                echo json_encode(['error' => 'No se pudo eliminar al paciente']);
-                            }
-                        } catch (Exception $e) {
-                            http_response_code(500);
-                            echo json_encode(['error' => 'Error del servidor: ' . $e->getMessage()]);
-                        }
-                    } else {
-                        http_response_code(400);
-                        echo json_encode(['error' => 'DNI no proporcionado']);
+            case 'DELETE':
+                error_log("DELETE request received");
+                $data = json_decode(file_get_contents('php://input'), true);
+            
+                if (isset($data['dni'])) {
+                    error_log("DNI received: " . $data['dni']);  // Log the received DNI
+                    try {
+                        $resultado = Paciente::eliminar($pdo, $data['dni']);
+                    } catch (Exception $e) {
+                        error_log("Exception caught when calling Paciente::eliminar: " . $e->getMessage());  // Log the exception message
+                        throw $e;  // Re-throw the exception so it can be caught in the outer catch block
                     }
-                    break;
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'DNI no proporcionado']);
+                }
+                break;
 
 
             default:
