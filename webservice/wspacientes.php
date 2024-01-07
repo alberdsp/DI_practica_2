@@ -7,9 +7,9 @@
  */
 
 // incluimos config con la bd y clase paciente
-include 'config.php';
-include 'models/Paciente.php';
-include 'validar_token.php';
+include '../config.php';
+include '../models/Paciente.php';
+include '../validar_token.php';
 
 header('Content-Type: application/json');
 

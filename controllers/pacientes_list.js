@@ -83,7 +83,7 @@ function realizarBusqueda(limit, offset) {
 
 
     // Solicitud Fetch al servidor
-    fetch('./wspacientes.php', {
+    fetch('webservice/wspacientes.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ function buscarPaciente(dni) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
     // Solicitud Fetch al servidor
-    return fetch('./wspacientes.php', {
+    return fetch('webservice/wspacientes.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ function crearBoton(texto, clases, onClick) {
 function editarPaciente(dni) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
-    fetch('wspacientes.php', {
+    fetch('webservice/wspacientes.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ function editarPaciente(dni) {
 function guardarPaciente(sip, dni, nombre, apellido1) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
-    let url = 'wspacientes.php'; // webserice url
+    let url = 'webservice/wspacientes.php'; // webserice url
     let data = { sip: sip, dni: dni, nombre: nombre, apellido1: apellido1 };
 
     fetch(url, {
@@ -381,7 +381,7 @@ function borrarPaciente(dni) {
     }
 
     // Configuración de la petición
-    fetch('wspacientes.php', {
+    fetch('webservice/wspacientes.php', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
