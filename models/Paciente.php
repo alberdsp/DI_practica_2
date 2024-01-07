@@ -5,14 +5,16 @@
  * Clase Paciente, contiene los datos esenciales de un paciente.
  */
 
- class Paciente {
+class Paciente
+{
     public $sip;
     public $dni;
     public $nombre;
     public $apellido1;
 
     // Constructor
-    function __construct($sip = null, $dni = null, $nombre = null, $apellido1 = null) {
+    function __construct($sip = null, $dni = null, $nombre = null, $apellido1 = null)
+    {
         if (func_num_args() > 0) {
             $this->sip = $sip;
             $this->dni = $dni;
@@ -20,7 +22,7 @@
             $this->apellido1 = $apellido1;
         }
     }
-    
+
 
     // Método mágico GET
     public function __get($property)
@@ -44,99 +46,125 @@
 
     //  Obtener todos los pacientes de la base de datos filtrando y poniendo limites
 
- public static function obtenerPacientes($pdo, $filtros = [], $limit = 10, $offset = 0) {
-    $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
-    $parametros = [];
-
-    if (!empty($filtros)) {
-        $clausulas = [];
-        foreach ($filtros as $campo => $valor) {
-            $clausulas[] = "$campo = ?";
-            $parametros[] = $valor;
-        }
-        $sql .= " WHERE " . implode(' AND ', $clausulas);
-        $sql .= " LIMIT $limit OFFSET $offset";
-    }
-
-    // establecer limites a la bd
-   // $sql .= " LIMIT ? OFFSET ?";
-   // $parametros[] = $limit;
-  //  $parametros[] = $offset;
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($parametros);
-
-
-
-    return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
-}
-
-
-    // Insertar nuevo paciente en la base de datos
-    public function insertar($pdo)
+    public static function obtenerPacientes($pdo, $filtros = [])
     {
+        $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
+        $parametros = [];
 
-        $sql = "INSERT INTO pacientes (nombre, edad, genero) VALUES (?, ?, ?)";
+        // limitamos los resultados si se proporcionan los parámetros limit y offset
+        $limit = isset($filtros['limit']) ? $filtros['limit'] : 10;
+        $offset = isset($filtros['offset']) ? $filtros['offset'] : 0;
+
+        if (!empty($filtros)) {
+            $clausulas = [];
+            foreach ($filtros as $campo => $valor) {
+                if ($campo !== 'limit' && $campo !== 'offset') {
+                    $clausulas[] = "$campo = ?";
+                    $parametros[] = $valor;
+                }
+            }
+            if (!empty($clausulas)) {
+                $sql .= " WHERE " . implode(' AND ', $clausulas);
+            }
+        }
+
+        // Add LIMIT and OFFSET clauses outside of the if condition
+        $sql .= " LIMIT $limit OFFSET $offset";
+
         $stmt = $pdo->prepare($sql);
-        return $stmt->execute([$this->nombre, $this->edad, $this->genero]);
+        $stmt->execute($parametros);
+
+        return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
     }
 
     // Actualizar datos del paciente en la base de datos
-    public function actualizar($pdo)
+    public static function actualizar($pdo, $paciente)
     {
-        if (empty($this->id)) {
-            throw new Exception("El ID es obligatorio para actualizar.");
+
+     // preparamos la transacción
+     $pdo->beginTransaction();
+
+     try {
+      
+        // consultamos el si id del paciente existe
+        $sql = "SELECT id FROM pacientes WHERE dni = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$paciente->dni]);
+        $objpaciente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($objpaciente) {
+
+            if (empty($paciente->dni)) {
+                throw new Exception("El DNI es obligatorio para actualizar.");
+            }
+
+            $sql = "UPDATE pacientes SET sip = ?, nombre = ?, apellido1 = ? WHERE dni = ?";
+            $stmt = $pdo->prepare($sql);
+           $stmt->execute([$paciente->sip, $paciente->nombre, $paciente->apellido1, $paciente->dni]);
+            $pdo->commit();
+            return true;
+        } else {
+            // si no existe el paciente lo creamos
+            $sql = "INSERT INTO pacientes (sip, dni, nombre, apellido1) VALUES (?, ?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$paciente->sip, $paciente->dni, $paciente->nombre, $paciente->apellido1]);
+            $pdo->commit();
+            return  true;
         }
 
-        $sql = "UPDATE pacientes SET nombre = ?, edad = ?, genero = ? WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        return $stmt->execute([$this->nombre, $this->edad, $this->genero, $this->id]);
+    } catch (Exception $e) {
+        // ocurrió error, hacemos roll back de la transacción
+        $pdo->rollBack();
+        throw $e;
     }
+}
+
 
 
     // función para eliminar paciente y todas sus foreing keys
-    public static function eliminar($pdo, $dni) {
+    public static function eliminar($pdo, $dni)
+    {
         if (empty($dni)) {
             throw new Exception("El dni es obligatorio para borrar.");
         }
-    
+
         // preparamos la transacción
         $pdo->beginTransaction();
-    
+
         try {
             // consultamos el id del paciente 
             $sql = "SELECT id FROM pacientes WHERE dni = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$dni]);
             $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
             if ($paciente) {
                 // obtenemos id de paciente
                 $sql = "SELECT id FROM citas WHERE paciente_id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$paciente['id']]);
                 $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
                 foreach ($citas as $cita) {
                     // borramos los tratamientos de cada cita del paciente
                     $sql = "DELETE FROM tratamientos WHERE cita_id = ?";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute([$cita['id']]);
                 }
-    
+
                 // borramos las citas del paciente
                 $sql = "DELETE FROM citas WHERE paciente_id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$paciente['id']]);
-    
+
                 // borramos al paciente
                 $sql = "DELETE FROM pacientes WHERE dni = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$dni]);
-    
+
                 // realizamos la transacción
                 $pdo->commit();
-    
+
                 return true;
             } else {
                 throw new Exception("No se encontró al paciente con el DNI proporcionado.");
@@ -147,13 +175,14 @@
             throw $e;
         }
     }
-    
 
 
-    
 
-// localizar paciente para editar datos por dni
-    public static function obtenerPacientePorDni($pdo, $dni) {
+
+
+    // localizar paciente para editar datos por dni
+    public static function obtenerPacientePorDni($pdo, $dni)
+    {
         $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes WHERE dni = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$dni]);

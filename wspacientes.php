@@ -91,12 +91,31 @@ if ($autenticado) {
 
 
 
-            case 'PUT':
-                $data = json_decode(file_get_contents('php://input'), true);
+                case 'PUT':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                
+                    if (isset($data['dni'])) {
+                        try {
+                            $paciente = new Paciente();
+                            $paciente->sip = isset($data['sip']) ? $data['sip'] : null;
+                            $paciente->dni = $data['dni'];
+                            $paciente->nombre = isset($data['nombre']) ? $data['nombre'] : null;
+                            $paciente->apellido1 = isset($data['apellido1']) ? $data['apellido1'] : null;
+                
+                            $resultado = Paciente::actualizar($pdo, $paciente);
+                
+                            echo json_encode(['result' => $resultado]);
+                        } catch (Exception $e) {
+                            error_log("Exception caught when calling Paciente::actualizar: " . $e->getMessage());
+                            throw $e;
+                        }
+                    } else {
+                        http_response_code(400);
+                        echo json_encode(['error' => 'DNI no proporcionado']);
+                    }
+                    break;
 
-
-                break;
-
+                    
             case 'DELETE':
                 error_log("DELETE request received");
                 $data = json_decode(file_get_contents('php://input'), true);

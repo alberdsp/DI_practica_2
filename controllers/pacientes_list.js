@@ -27,8 +27,7 @@ function mostrarToken() {
 }
 
 
-
-function realizarBusqueda() {
+function realizarBusqueda(limit, offset) {
     // Captura del token de la sesión
     let token = sessionStorage.getItem('token_hospital_gest');
 
@@ -37,7 +36,11 @@ function realizarBusqueda() {
     let filtros = {};
     formData.forEach((value, key) => { filtros[key] = value; });
 
-    // console.log(filtros); // Imprimir filtros para depuración
+    // añadimos los limites de la consulta
+    filtros.limit = limit;
+    filtros.offset = offset;
+
+  
 
     // Solicitud Fetch al servidor
     fetch('./wspacientes.php', {
@@ -56,7 +59,7 @@ function realizarBusqueda() {
             }
         })
         .then(data => {
-            console.log(data); // Imprimir para depuración
+           // console.log(data); // Imprimir para depuración
             mostrarPacientes(data);
         })
         .catch(error => console.error('Error:', error));
@@ -87,7 +90,7 @@ function buscarPaciente(dni) {
 
         })
         .then(data => {
-            console.log(data); // Imprimir para depuración
+           // console.log(data); // Imprimir para depuración
             mostrarPacientes(data);
         })
         .catch(error => console.error('Error:', error));
@@ -224,7 +227,7 @@ function editarPaciente(dni) {
                 let dni = document.getElementById('dni').value;
                 let nombre = document.getElementById('nombre').value;
                 let apellido1 = document.getElementById('apellido1').value;
-                guardarPaciente(dni, sip, nombre, apellido1);
+                guardarPaciente(sip,dni, nombre, apellido1);
             };
 
             // botón de cancelar
@@ -233,8 +236,7 @@ function editarPaciente(dni) {
             botonCancelar.innerText = 'Cancelar';
             botonCancelar.classList.add('btn', 'btn-primary', 'mr-2');
             botonCancelar.onclick = function () {
-                document.getElementById('filtroForm').reset();
-                realizarBusqueda();
+                resetearFormulario();
             };
 
             // si el formulario no contiene el boton de guardar 
@@ -254,33 +256,55 @@ function editarPaciente(dni) {
 }
 
 // Guardar paciente
-function guardarPaciente(dni, sip, nombre, apellido1) {
+function guardarPaciente(sip, dni, nombre, apellido1) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
-    // Configuración de la petición
-    fetch('wspacientes.php', {
+    let url = 'wspacientes.php'; // webserice url
+    let data = {sip: sip, dni: dni, nombre: nombre, apellido1: apellido1};
+
+    fetch(url, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token  // Token real aquí
+            'Authorization': 'Bearer ' + token // aquí  va el token
         },
-        body: JSON.stringify({ dni: dni, sip: sip, nombre: nombre, apellido1: apellido1 }) // enviar los nuevos detalles del paciente en el cuerpo
+        body: JSON.stringify(data)
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            return response.json(); // o response.text() si el servidor responde con texto
-        })
-        .then(data => {
-            console.log('Paciente editado:', data);
-            // Aquí puedes añadir código para actualizar la interfaz de usuario, como actualizar la fila de la tabla
-        })
-        .catch(error => {
-            console.error('Error al editar paciente:', error);
-            // Manejo de errores, como mostrar un mensaje al usuario
-        });
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('la respuesta fue fallida');
+        }
+document.getElementById('buscar').click();
+        return response.json();
+       
+    })
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
+
+
+// resetear formulario
+function resetearFormulario() {
+
+    document.getElementById('filtroForm').reset();
+
+    let botonGuardarActual = document.getElementById('botonGuardar');
+    let botonCancelarActual = document.getElementById('botonCancelar');
+    // si el formulario contiene el boton de guardar y cancelar los borramos
+    if ((botonGuardarActual && botonCancelarActual)) {
+        document.getElementById('botonGuardar').remove();
+        document.getElementById('botonCancelar').remove();
+    }
+
+    document.getElementById('buscar').click();
+
+}
+
+
 
 // borrar paciente
 function borrarPaciente(dni) {
