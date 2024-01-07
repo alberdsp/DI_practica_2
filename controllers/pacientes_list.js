@@ -28,17 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// listener para el boton de insertar
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('filtroForm').addEventListener('insertar', (event) => {
-        event.preventDefault();
-
-        realizarBusqueda();
-    });
-});
-
-
-
 
 function mostrarToken() {
     let token = sessionStorage.getItem('token_hospital_gest');
@@ -284,9 +273,10 @@ function editarPaciente(dni) {
                 document.getElementById('filtroForm').appendChild(botonCancelar);
             }
 
-            // eliminamos los botones de buscar e insertar
+            // eliminamos los botones de buscar, insertar y limpiar 
             let buscarButton = document.getElementById('buscar');
             let insertarButton = document.getElementById('insertar');
+            let limpiarButton = document.getElementById('limpiar');
 
             if (buscarButton) {
                 document.getElementById('buscar').remove();
@@ -295,6 +285,9 @@ function editarPaciente(dni) {
             if (insertarButton) {
                 insertarButton.remove();
             }
+             if (limpiarButton) {
+                limpiarButton.remove();
+             }
 
         })
         .catch(error => {
@@ -372,6 +365,7 @@ function resetearFormulario() {
 
     let botonGuardarActual = document.getElementById('botonGuardar');
     let botonCancelarActual = document.getElementById('botonCancelar');
+    
     // si el formulario contiene el boton de guardar y cancelar los borramos
     if ((botonGuardarActual && botonCancelarActual)) {
         document.getElementById('botonGuardar').remove();
@@ -391,7 +385,7 @@ function resetearFormulario() {
         let botonInsertar = document.createElement('button');
         botonInsertar.id = 'insertar'; // Asignamos el ID
         botonInsertar.innerText = 'Insertar';
-        botonInsertar.classList.add('btn btn-success text-light mr-2', 'mr-2');
+        botonInsertar.classList.add('btn', 'btn-success', 'text-light', 'mr-2');
         botonInsertar.onclick = function () {
             guardarPaciente();
         }
@@ -401,7 +395,7 @@ function resetearFormulario() {
         botonLimpiar.innerText = 'Limpiar';
         botonLimpiar.classList.add('btn', 'btn-primary', 'mr-2');
         botonLimpiar.onclick = function () {
-            document.getElementById('filtroForm').reset();
+           resetearFormulario();
         }
 
 
