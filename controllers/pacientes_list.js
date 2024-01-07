@@ -8,6 +8,8 @@
  */
 
 
+
+// listener para el botón de buscar
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtroForm').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -17,14 +19,23 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function mostrarToken() {
-    let token = sessionStorage.getItem('token_hospital_gest');
-    if (token) {
-        document.getElementById('lista_pacientes').innerText = "Token: " + token;
-    } else {
-        document.getElementById('lista_pacientes').innerText = "No hay token disponible.";
-    }
-}
+    // listener para el boton de insertar
+    document.getElementById('insertar').addEventListener('click', (event) => {
+        event.preventDefault();
+        guardarPaciente();
+    });
+
+// listener para el botón de limpiar
+document.getElementById('limpiar').addEventListener('click', (event) => {
+    event.preventDefault();
+    resetearFormulario();
+    realizarBusqueda();
+});
+
+
+
+
+// función para realizar la busqueda
 
 
 function realizarBusqueda(limit, offset) {
@@ -191,6 +202,9 @@ function crearBoton(texto, clases, onClick) {
     return boton;
 }
 
+
+
+// funcion para editar paciente
 function editarPaciente(dni) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
@@ -260,7 +274,8 @@ function editarPaciente(dni) {
         });
 }
 
-// Guardar paciente
+// Guardar paciente, también se usa para insertar
+
 function guardarPaciente(sip, dni, nombre, apellido1) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
@@ -305,6 +320,9 @@ function guardarPaciente(sip, dni, nombre, apellido1) {
 // resetear formulario
 function resetearFormulario() {
 
+
+
+
     document.getElementById('filtroForm').reset();
 
     let botonGuardarActual = document.getElementById('botonGuardar');
@@ -314,8 +332,10 @@ function resetearFormulario() {
         document.getElementById('botonGuardar').remove();
         document.getElementById('botonCancelar').remove();
     }
-
-    document.getElementById('buscar').click();
+    document.getElementById('buscar').style.display = 'inline-block';
+    document.getElementById('insertar').style.display = 'inline-block';
+    document.getElementById('limpiar').style.display = 'inline-block';
+document.getElementById('buscar').click();
 
 }
 
