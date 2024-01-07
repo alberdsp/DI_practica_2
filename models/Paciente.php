@@ -168,7 +168,7 @@ class Paciente
                 // realizamos la transacción
                 $pdo->commit();
 
-                return true;
+                return json_encode(['result' => 'success', 'deleted_dni' => $dni]);
             } else {
                 throw new Exception("No se encontró al paciente con el DNI proporcionado.");
             }

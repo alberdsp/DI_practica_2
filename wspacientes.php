@@ -121,12 +121,12 @@ if ($autenticado) {
                 $data = json_decode(file_get_contents('php://input'), true);
             
                 if (isset($data['dni'])) {
-                    error_log("DNI received: " . $data['dni']);  // Log the received DNI
+                    error_log("DNI recibido: " . $data['dni']);  // log recibido
                     try {
                         $resultado = Paciente::eliminar($pdo, $data['dni']);
                     } catch (Exception $e) {
-                        error_log("Exception caught when calling Paciente::eliminar: " . $e->getMessage());  // Log the exception message
-                        throw $e;  // Re-throw the exception so it can be caught in the outer catch block
+                        error_log("Excepción llamando Paciente::eliminar: " . $e->getMessage());  // Log recibido
+                        throw $e;  // trhow la excepcion
                     }
                 } else {
                     http_response_code(400);
@@ -142,6 +142,6 @@ if ($autenticado) {
         }
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Error interno del servidor']);
+        echo json_encode(['error' => 'Error interno del servidor recibiendo la petición'.  $method . ' '. $data['dni'] . ' ' . $e->getMessage()]);
     }
 }

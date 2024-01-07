@@ -309,6 +309,7 @@ function guardarPaciente(sip, dni, nombre, apellido1) {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token, // aquí  va el token
             'Cache-Control': 'no-cache'
+            
         },
         body: JSON.stringify(data)
     })
@@ -342,7 +343,6 @@ function guardarPaciente(sip, dni, nombre, apellido1) {
             botonInsertar.onclick = function () {
                 guardarPaciente();
             }
-
 
 
 
@@ -393,7 +393,7 @@ function resetearFormulario() {
         let botonLimpiar = document.createElement('button');
         botonLimpiar.id = 'limpiar'; // Assign the ID
         botonLimpiar.innerText = 'Limpiar';
-        botonLimpiar.classList.add('btn', 'btn-primary', 'mr-2');
+        botonLimpiar.classList.add('btn', 'btn-warning', 'mr-2');
         botonLimpiar.onclick = function () {
            resetearFormulario();
         }
@@ -423,7 +423,8 @@ function borrarPaciente(dni) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token  // Token real aquí
+            'Authorization': 'Bearer ' + token,  // Token real aquí
+            'Cache-Control': 'no-cache'
         },
         body: JSON.stringify({ dni: dni }) // enviar acción y DNI en el cuerpo
     })
