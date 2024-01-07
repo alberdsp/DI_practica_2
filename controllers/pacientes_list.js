@@ -8,13 +8,36 @@
  */
 
 
+
+// listener para el boton de buscar
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('filtroForm').addEventListener('submit', (event) => {
+    document.getElementById('buscar').addEventListener('click', (event) => {
+        event.preventDefault();
+        realizarBusqueda();
+    });
+    // listener para el boton de insertar
+    document.getElementById('insertar').addEventListener('click', (event) => {
+        event.preventDefault();
+        actualizarPaciente();
+    });
+    // listener para el boton de limpiar
+    document.getElementById('limpiar').addEventListener('click', (event) => {
+        event.preventDefault();
+        resetearFormulario();
+        realizarBusqueda();
+    });
+});
+
+// listener para el boton de insertar
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('filtroForm').addEventListener('insertar', (event) => {
         event.preventDefault();
 
         realizarBusqueda();
     });
 });
+
+
 
 
 function mostrarToken() {
@@ -40,14 +63,15 @@ function realizarBusqueda(limit, offset) {
     filtros.limit = limit;
     filtros.offset = offset;
 
-  
+
 
     // Solicitud Fetch al servidor
     fetch('./wspacientes.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token  // Token real aquí
+            'Authorization': 'Bearer ' + token,  // Token real aquí
+            'Cache-Control': 'no-cache'
         },
         body: JSON.stringify(filtrarYPrepararDatos(filtros))
     })
@@ -59,7 +83,7 @@ function realizarBusqueda(limit, offset) {
             }
         })
         .then(data => {
-           // console.log(data); // Imprimir para depuración
+            // console.log(data); // Imprimir para depuración
             mostrarPacientes(data);
         })
         .catch(error => console.error('Error:', error));
@@ -77,7 +101,8 @@ function buscarPaciente(dni) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token  // Token real aquí
+            'Authorization': 'Bearer ' + token,  // Token real aquí
+            'Cache-Control': 'no-cache'
         },
         body: JSON.stringify({ dni: dni })
     })
@@ -90,7 +115,7 @@ function buscarPaciente(dni) {
 
         })
         .then(data => {
-           // console.log(data); // Imprimir para depuración
+            // console.log(data); // Imprimir para depuración
             mostrarPacientes(data);
         })
         .catch(error => console.error('Error:', error));
@@ -191,14 +216,24 @@ function crearBoton(texto, clases, onClick) {
     return boton;
 }
 
+
+// evento listener para asegurarnos que se carga primero el DOM
+
+
+
+// metodo para editar paciente elimina los botones buscar e insertar y añade el boton de guardar y cancelar
+
 function editarPaciente(dni) {
+
+
     let token = sessionStorage.getItem('token_hospital_gest');
 
     fetch('wspacientes.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
+            'Authorization': 'Bearer ' + token, // aquí  va el token
+            'Cache-Control': 'no-cache'
         },
         body: JSON.stringify({ dni: dni })
     })
@@ -219,7 +254,7 @@ function editarPaciente(dni) {
 
             // botón de guardar
             let botonGuardar = document.createElement('button');
-            botonGuardar.id = 'botonGuardar'; // Assign the ID
+            botonGuardar.id = 'botonGuardar'; // Asignamos el ID
             botonGuardar.innerText = 'Guardar';
             botonGuardar.classList.add('btn', 'btn-primary', 'mr-2');
             botonGuardar.onclick = function () {
@@ -227,19 +262,19 @@ function editarPaciente(dni) {
                 let dni = document.getElementById('dni').value;
                 let nombre = document.getElementById('nombre').value;
                 let apellido1 = document.getElementById('apellido1').value;
-                guardarPaciente(sip,dni, nombre, apellido1);
+                guardarPaciente(sip, dni, nombre, apellido1);
             };
 
             // botón de cancelar
             let botonCancelar = document.createElement('button');
-            botonCancelar.id = 'botonCancelar'; // Assign the ID
+            botonCancelar.id = 'botonCancelar'; // Asignamos el ID
             botonCancelar.innerText = 'Cancelar';
             botonCancelar.classList.add('btn', 'btn-primary', 'mr-2');
             botonCancelar.onclick = function () {
                 resetearFormulario();
             };
 
-            // si el formulario no contiene el boton de guardar 
+            // gestión de los botones de guardar, cancelar, buscar e insertar
             let botonGuardarActual = document.getElementById('botonGuardar');
             let botonCancelarActual = document.getElementById('botonCancelar');
             if (!(botonGuardarActual && botonCancelarActual)) {
@@ -249,41 +284,84 @@ function editarPaciente(dni) {
                 document.getElementById('filtroForm').appendChild(botonCancelar);
             }
 
+            // eliminamos los botones de buscar e insertar
+            let buscarButton = document.getElementById('buscar');
+            let insertarButton = document.getElementById('insertar');
+
+            if (buscarButton) {
+                document.getElementById('buscar').remove();
+            }
+
+            if (insertarButton) {
+                insertarButton.remove();
+            }
+
         })
         .catch(error => {
             console.error('Error al editar paciente:', error);
         });
 }
 
+
 // Guardar paciente
 function guardarPaciente(sip, dni, nombre, apellido1) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
     let url = 'wspacientes.php'; // webserice url
-    let data = {sip: sip, dni: dni, nombre: nombre, apellido1: apellido1};
+    let data = { sip: sip, dni: dni, nombre: nombre, apellido1: apellido1 };
 
     fetch(url, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token // aquí  va el token
+            'Authorization': 'Bearer ' + token, // aquí  va el token
+            'Cache-Control': 'no-cache'
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('la respuesta fue fallida');
-        }
-document.getElementById('buscar').click();
-        return response.json();
-       
-    })
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('la respuesta fue fallida');
+            }
+            document.getElementById('buscar').click();
+            // si el formulario contiene el boton de guardar y cancelar los borramos
+            let botonGuardarActual = document.getElementById('botonGuardar');
+            let botonCancelarActual = document.getElementById('botonCancelar');
+
+            if ((botonGuardarActual && botonCancelarActual)) {
+                document.getElementById('botonGuardar').remove();
+                document.getElementById('botonCancelar').remove();
+            }
+
+            // añadimos los botones de buscar e insertar
+            let botonBuscar = document.createElement('button');
+            botonBuscar.id = 'buscar'; // asignamos el ID
+            botonBuscar.innerText = 'Buscar';
+            botonBuscar.classList.add('btn', 'btn-primary', 'mr-2');
+            botonBuscar.onclick = function () {
+                realizarBusqueda();
+            }
+
+            let botonInsertar = document.createElement('button');
+            botonInsertar.id = 'insertar'; // Asignamos el ID
+            botonInsertar.innerText = 'Insertar';
+            botonInsertar.classList.add('btn', 'btn-primary', 'mr-2');
+            botonInsertar.onclick = function () {
+                guardarPaciente();
+            }
+
+
+
+
+            return response.json();
+
+        })
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }
 
 
@@ -300,7 +378,39 @@ function resetearFormulario() {
         document.getElementById('botonCancelar').remove();
     }
 
-    document.getElementById('buscar').click();
+    if (!document.getElementById('buscar') && !document.getElementById('insertar') && !document.getElementById('limpiar')) {
+        // añadimos los botones de buscar e insertar
+        let botonBuscar = document.createElement('button');
+        botonBuscar.id = 'buscar'; // asignamos el ID
+        botonBuscar.innerText = 'Buscar';
+        botonBuscar.classList.add('btn', 'btn-primary', 'mr-2');
+        botonBuscar.onclick = function () {
+            realizarBusqueda();
+        }
+
+        let botonInsertar = document.createElement('button');
+        botonInsertar.id = 'insertar'; // Asignamos el ID
+        botonInsertar.innerText = 'Insertar';
+        botonInsertar.classList.add('btn btn-success text-light mr-2', 'mr-2');
+        botonInsertar.onclick = function () {
+            guardarPaciente();
+        }
+
+        let botonLimpiar = document.createElement('button');
+        botonLimpiar.id = 'limpiar'; // Assign the ID
+        botonLimpiar.innerText = 'Limpiar';
+        botonLimpiar.classList.add('btn', 'btn-primary', 'mr-2');
+        botonLimpiar.onclick = function () {
+            document.getElementById('filtroForm').reset();
+        }
+
+
+
+        document.getElementById('filtroForm').appendChild(botonBuscar);
+        document.getElementById('filtroForm').appendChild(botonInsertar);
+        document.getElementById('filtroForm').appendChild(botonLimpiar);
+    }
+
 
 }
 

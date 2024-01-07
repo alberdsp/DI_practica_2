@@ -104,6 +104,9 @@ class Paciente
             $pdo->commit();
             return true;
         } else {
+
+// TODO FALTA IMPLEMENTAR LA CREACION DE NUEVOS PACIENTES
+
             // si no existe el paciente lo creamos
             $sql = "INSERT INTO pacientes (sip, dni, nombre, apellido1) VALUES (?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
