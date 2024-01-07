@@ -13,8 +13,8 @@ $apellido1 = '';
 
 
 <head>
-
-
+    
+        
 
     <script src="vendor/js/color-modes.js"></script>
 
@@ -86,10 +86,10 @@ $apellido1 = '';
         <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
 
 
-            <!-- formulario de filtros  -->
+             <!-- formulario de filtros  -->
 
             <div class="lh-1">
-
+               
                 <form id='filtroForm' class="form">
                     <label for="sip">SIP:</label>
                     <input type="text" id="sip" name="sip" value="">
@@ -98,8 +98,8 @@ $apellido1 = '';
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" value="">
                     <label for="apellido1">Apellido1:</label>
-                    <input type="text" id="apellido1" name="apellido1" value="">
-                    <button class="btn btn-primary mr-2" type="submit" id="buscar">Buscar</button>
+                    <input type="text" id="apellido1" name="apellido1" value=""> 
+                    <button  class="btn btn-primary mr-2" type="submit" id="buscar">Buscar</button>
                     <button class="btn btn-success text-light mr-2" type="submit" id="insertar">Insertar</button>
                     <button class="btn btn-warning mr-2" type="submit" id="limpiar">Limpiar</button>
                 </form>
@@ -111,26 +111,24 @@ $apellido1 = '';
 
             <!-- Nombre del listado  -->
             <h6 class="border-bottom pb-2 mb-0">Listado de pacientes</h6>
-            <div id='lista_pacientes2' class="d-flex text-body-secondary pt-3">
-
+            <div id='lista_pacientes2'class="d-flex text-body-secondary pt-3">
+              
             </div>
 
+         
 
-
-
-
-
+            
+    
+    
         </div>
-        <nav aria-label="ejemplo de paginación">
-            <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="#" data-action="first"><<</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#" data-action="prev"><</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#" data-action="next">></a></li>
-                <li class="page-item"><a class="page-link" href="#" data-action="last">>></a></li>
-            </ul>
-        </nav>
+<nav aria-label="ejemplo de paginación">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#" data-action="first"><<</a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-action="prev"><</a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-action="next">></a></li>
+                    <li class="page-item"><a class="page-link" href="#" data-action="last">>></a></li>
+                </ul>
+            </nav>
 
     </main>
     <script src="vendor/js/bootstrap.bundle.min.js"></script>
