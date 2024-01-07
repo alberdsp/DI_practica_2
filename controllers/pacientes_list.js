@@ -7,8 +7,6 @@
  * 
  */
 
-
-
 // listener para el botón de buscar
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtroForm').addEventListener('submit', (event) => {
@@ -19,19 +17,40 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-    // listener para el boton de insertar
-    document.getElementById('insertar').addEventListener('click', (event) => {
-        event.preventDefault();
-        guardarPaciente();
-    });
 
 // listener para el botón de limpiar
 document.getElementById('limpiar').addEventListener('click', (event) => {
     event.preventDefault();
+
     resetearFormulario();
-    realizarBusqueda();
 });
 
+
+
+// listener para el boton de insertar
+document.getElementById('insertar').addEventListener('click', async (event) => {
+    event.preventDefault();
+    let sip = document.getElementById('sip').value;
+    let dni = document.getElementById('dni').value;
+    let nombre = document.getElementById('nombre').value;
+    let apellido1 = document.getElementById('apellido1').value;
+
+
+    // promesa asyncrona para recibir los datos si existe el paciente
+    let response = await buscarPaciente(dni);
+
+    // si el paciente existe mostramos un mensaje de alerta
+    if (response.data && response.data.length > 0) {
+        alert('El paciente ya existe');
+        // si hay campos vacios mostramos un mensaje de alerta
+    } else if (sip == '' || dni == '' || nombre == '' || apellido1 == '') {
+        alert('Debes rellenar todos los campos');
+
+        // finalemnte si no existe el paciente y los campos no estan vacios lo insertamos
+    } else {
+        guardarPaciente(sip, dni, nombre, apellido1);
+    }
+});
 
 
 
@@ -51,7 +70,7 @@ function realizarBusqueda(limit, offset) {
     filtros.limit = limit;
     filtros.offset = offset;
 
-  
+
 
     // Solicitud Fetch al servidor
     fetch('./wspacientes.php', {
@@ -70,11 +89,12 @@ function realizarBusqueda(limit, offset) {
             }
         })
         .then(data => {
-           // console.log(data); // Imprimir para depuración
+            // console.log(data); // Imprimir para depuración
             mostrarPacientes(data);
         })
         .catch(error => console.error('Error:', error));
 }
+
 
 
 // función para buscar paciente por dni
@@ -83,8 +103,7 @@ function buscarPaciente(dni) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
     // Solicitud Fetch al servidor
-
-    fetch('./wspacientes.php', {
+    return fetch('./wspacientes.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -98,15 +117,17 @@ function buscarPaciente(dni) {
             } else {
                 return response.text().then(text => { throw new Error(text) });
             }
-
         })
         .then(data => {
-           // console.log(data); // Imprimir para depuración
+            // console.log(data); // Imprimir para depuración
             mostrarPacientes(data);
+            return data;
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            return null;
+        });
 }
-
 
 
 
@@ -241,7 +262,7 @@ function editarPaciente(dni) {
                 let dni = document.getElementById('dni').value;
                 let nombre = document.getElementById('nombre').value;
                 let apellido1 = document.getElementById('apellido1').value;
-                guardarPaciente(sip,dni, nombre, apellido1);
+                guardarPaciente(sip, dni, nombre, apellido1);
             };
 
             // botón de cancelar
@@ -263,9 +284,9 @@ function editarPaciente(dni) {
                 document.getElementById('filtroForm').appendChild(botonCancelar);
             }
 
-             document.getElementById('buscar').style.display = 'none';
-             document.getElementById('insertar').style.display = 'none';
-             document.getElementById('limpiar').style.display = 'none';
+            document.getElementById('buscar').style.display = 'none';
+            document.getElementById('insertar').style.display = 'none';
+            document.getElementById('limpiar').style.display = 'none';
 
 
         })
@@ -280,7 +301,7 @@ function guardarPaciente(sip, dni, nombre, apellido1) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
     let url = 'wspacientes.php'; // webserice url
-    let data = {sip: sip, dni: dni, nombre: nombre, apellido1: apellido1};
+    let data = { sip: sip, dni: dni, nombre: nombre, apellido1: apellido1 };
 
     fetch(url, {
         method: 'PUT',
@@ -290,30 +311,30 @@ function guardarPaciente(sip, dni, nombre, apellido1) {
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('la respuesta fue fallida');
-        }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('la respuesta fue fallida');
+            }
 
-        document.getElementById('buscar').style.display = 'inline-block';
-        document.getElementById('insertar').style.display = 'inline-block';
-        document.getElementById('limpiar').style.display = 'inline-block';
-        document.getElementById('buscar').click();
-        document.getElementById('botonGuardar').remove();
-        document.getElementById('botonCancelar').remove();
-
-
+            document.getElementById('buscar').style.display = 'inline-block';
+            document.getElementById('insertar').style.display = 'inline-block';
+            document.getElementById('limpiar').style.display = 'inline-block';
+            document.getElementById('buscar').click();
+            document.getElementById('botonGuardar').remove();
+            document.getElementById('botonCancelar').remove();
 
 
-        return response.json();
-       
-    })
-    .then(data => {
-        console.log('Success:', data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+
+
+            return response.json();
+
+        })
+        .then(data => {
+            console.log('guardado correctamente');
+        })
+        .catch((error) => {
+            console.log('Error: al guardar');
+        });
 }
 
 
@@ -335,7 +356,7 @@ function resetearFormulario() {
     document.getElementById('buscar').style.display = 'inline-block';
     document.getElementById('insertar').style.display = 'inline-block';
     document.getElementById('limpiar').style.display = 'inline-block';
-document.getElementById('buscar').click();
+    document.getElementById('buscar').click();
 
 }
 
@@ -362,14 +383,19 @@ function borrarPaciente(dni) {
             if (!response.ok) {
                 throw new Error('Error en la respuesta del servidor');
             }
+
+            alert('Paciente borrado correctamente');
+            resetearFormulario();
             return response.json(); // o response.text() si el servidor responde con texto
         })
         .then(data => {
-            console.log('Paciente borrado:', data);
+            console.log('Paciente borrado:');
+            alert('Paciente borrado correctamente');
+            resetearFormulario();
             // Aquí puedes añadir código para actualizar la interfaz de usuario, como quitar la fila de la tabla
         })
         .catch(error => {
-            console.error('Error al borrar paciente:', error);
+            // console.error('Error al borrar paciente:', error);
             // Manejo de errores, como mostrar un mensaje al usuario
         });
 }

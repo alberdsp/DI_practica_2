@@ -91,42 +91,44 @@ if ($autenticado) {
 
 
 
-                case 'PUT':
-                    $data = json_decode(file_get_contents('php://input'), true);
-                
-                    if (isset($data['dni'])) {
-                        try {
-                            $paciente = new Paciente();
-                            $paciente->sip = isset($data['sip']) ? $data['sip'] : null;
-                            $paciente->dni = $data['dni'];
-                            $paciente->nombre = isset($data['nombre']) ? $data['nombre'] : null;
-                            $paciente->apellido1 = isset($data['apellido1']) ? $data['apellido1'] : null;
-                
-                            $resultado = Paciente::actualizar($pdo, $paciente);
-                
-                            echo json_encode(['result' => $resultado]);
-                        } catch (Exception $e) {
-                            error_log("Exception caught when calling Paciente::actualizar: " . $e->getMessage());
-                            throw $e;
-                        }
-                    } else {
-                        http_response_code(400);
-                        echo json_encode(['error' => 'DNI no proporcionado']);
-                    }
-                    break;
+            case 'PUT':
+                $data = json_decode(file_get_contents('php://input'), true);
 
-                    
+
+
+                if (isset($data['dni'])) {
+                    try {
+                        $paciente = new Paciente();
+                        $paciente->sip = isset($data['sip']) ? $data['sip'] : null;
+                        $paciente->dni = $data['dni'];
+                        $paciente->nombre = isset($data['nombre']) ? $data['nombre'] : null;
+                        $paciente->apellido1 = isset($data['apellido1']) ? $data['apellido1'] : null;
+
+                        $resultado = Paciente::actualizar($pdo, $paciente);
+
+                        echo json_encode(['result' => $resultado]);
+                    } catch (Exception $e) {
+                        error_log("Exception capturada Paciente::actualizar: " . $e->getMessage());
+                        throw $e;
+                    }
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'DNI no proporcionado']);
+                }
+                break;
+
+
             case 'DELETE':
                 error_log("DELETE request received");
                 $data = json_decode(file_get_contents('php://input'), true);
-            
+
                 if (isset($data['dni'])) {
-                    error_log("DNI received: " . $data['dni']);  // Log the received DNI
+                    error_log("DNI received: " . $data['dni']);  // Log  DNI
                     try {
                         $resultado = Paciente::eliminar($pdo, $data['dni']);
                     } catch (Exception $e) {
-                        error_log("Exception caught when calling Paciente::eliminar: " . $e->getMessage());  // Log the exception message
-                        throw $e;  // Re-throw the exception so it can be caught in the outer catch block
+                        error_log("Exception capturada Paciente::eliminar: " . $e->getMessage());  // Log mensaje de error
+                        throw $e;  // Re-throw excepción para que el controlador la capture
                     }
                 } else {
                     http_response_code(400);

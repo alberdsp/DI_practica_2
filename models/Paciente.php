@@ -77,47 +77,46 @@ class Paciente
         return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
     }
 
-    // Actualizar datos del paciente en la base de datos
+    // Actualizar datos del paciente en la base de datos, si no existe lo crea
     public static function actualizar($pdo, $paciente)
     {
 
-     // preparamos la transacción
-     $pdo->beginTransaction();
+        // preparamos la transacción
+        $pdo->beginTransaction();
 
-     try {
-      
-        // consultamos el si id del paciente existe
-        $sql = "SELECT id FROM pacientes WHERE dni = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$paciente->dni]);
-        $objpaciente = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
 
-        if ($objpaciente) {
+            // consultamos el si id del paciente existe
+            $sql = "SELECT id FROM pacientes WHERE dni = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$paciente->dni]);
+            $objpaciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (empty($paciente->dni)) {
-                throw new Exception("El DNI es obligatorio para actualizar.");
+            if ($objpaciente) {
+
+                if (empty($paciente->dni)) {
+                    throw new Exception("El DNI es obligatorio para actualizar.");
+                }
+
+                $sql = "UPDATE pacientes SET sip = ?, nombre = ?, apellido1 = ? WHERE dni = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$paciente->sip, $paciente->nombre, $paciente->apellido1, $paciente->dni]);
+                $pdo->commit();
+                return true;
+            } else {
+                // si no existe el paciente lo creamos
+                $sql = "INSERT INTO pacientes (sip, dni, nombre, apellido1) VALUES (?, ?, ?, ?)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$paciente->sip, $paciente->dni, $paciente->nombre, $paciente->apellido1]);
+                $pdo->commit();
+                return  true;
             }
-
-            $sql = "UPDATE pacientes SET sip = ?, nombre = ?, apellido1 = ? WHERE dni = ?";
-            $stmt = $pdo->prepare($sql);
-           $stmt->execute([$paciente->sip, $paciente->nombre, $paciente->apellido1, $paciente->dni]);
-            $pdo->commit();
-            return true;
-        } else {
-            // si no existe el paciente lo creamos
-            $sql = "INSERT INTO pacientes (sip, dni, nombre, apellido1) VALUES (?, ?, ?, ?)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$paciente->sip, $paciente->dni, $paciente->nombre, $paciente->apellido1]);
-            $pdo->commit();
-            return  true;
+        } catch (Exception $e) {
+            // ocurrió error, hacemos roll back de la transacción
+            $pdo->rollBack();
+            throw $e;
         }
-
-    } catch (Exception $e) {
-        // ocurrió error, hacemos roll back de la transacción
-        $pdo->rollBack();
-        throw $e;
     }
-}
 
 
 
