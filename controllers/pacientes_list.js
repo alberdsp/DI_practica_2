@@ -8,6 +8,16 @@
  */
 
 // listener para el botón de buscar
+
+
+// obtenemos el token de la sesión para controlar el acceso rdirecto a la página
+let token = sessionStorage.getItem('token_hospital_gest');
+
+// Si el token no existe redirigimos al login
+if (!token) {
+    window.location.href = './index.html'; 
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtroForm').addEventListener('submit', (event) => {
         event.preventDefault();
