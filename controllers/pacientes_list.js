@@ -22,7 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtroForm').addEventListener('submit', (event) => {
         event.preventDefault();
 
-        realizarBusqueda();
+
+        // raliar la busqueda con los datos del formulario y limites de la paginación
+        realizarBusqueda(totalPaginas,registroInicio);
     });
 });
 
