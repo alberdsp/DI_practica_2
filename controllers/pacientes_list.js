@@ -9,6 +9,8 @@
 
 // listener para el botón de buscar
 
+// variables para el paginador
+var totalRegistros = 0;
 
 // obtenemos el token de la sesión para controlar el acceso rdirecto a la página
 let token = sessionStorage.getItem('token_hospital_gest');
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // raliar la busqueda con los datos del formulario y limites de la paginación
-        realizarBusqueda(totalPaginas,registroInicio);
+        realizarBusqueda(limiteRegistros,registroInicio);
     });
 });
 
@@ -215,10 +217,16 @@ function mostrarPacientes(respuesta) {
         });
         // Añadir la tabla al contenedor
         contenedor.appendChild(tabla);
+
+        // llamamos a la función para obtener el total de paginas del paginador.js
+        obtenerTotalPaginas(respuesta.total_registros);
+
     } else {
         console.error('Se esperaba un objeto con una propiedad "data" que es un array, pero se recibió:', respuesta);
         contenedor.innerText = 'No se pudieron cargar los datos de los pacientes.';
     }
+
+
 }
 
 function crearCelda(texto) {

@@ -2,14 +2,28 @@
 // paginador controller
 
 var paginaActual = 1;
-var limitePaginas = 10; // limite de paginas a mostrar
+var limiteRegistros = 10; // limite de paginas a mostrar
 var registroInicio = 0; // registro inicial
-var totalPaginas = 10; // total de paginas
+var totalPaginas = 0; // total de paginas
 
 // Funcion para cargar la pagina
 function cargarPagina(numeroPag) {
     // Load the page here
     console.log(`Cargar página ${numeroPag}`);
+}
+
+
+// funcion para obtener el total de paginas
+function obtenerTotalPaginas(totalRegistros) {
+
+    totalPaginas = Math.ceil(totalRegistros / limiteRegistros);
+
+// instertamos el total de paginas, pagina actual y nº de registros  en el elemento html
+
+ 
+    document.getElementById('detalleregistros').innerHTML = "  *  " + totalRegistros + "  registros -   " + 
+    "  página " + paginaActual + " de " + totalPaginas;
+
 }
 
 
@@ -30,7 +44,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
         case 'anterior':
             if (paginaActual > 1) {
                 paginaActual--;
-                registroInicio = (paginaActual - 1) * limitePaginas;
+                registroInicio = (paginaActual - 1) * limiteRegistros;
             }
 
             //  registroInicio = 1;
@@ -41,7 +55,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
         case 'siguiente':
             if (paginaActual < totalPaginas) {
                 paginaActual++;
-                registroInicio = (paginaActual - 1) * limitePaginas;
+                registroInicio = (paginaActual - 1) * limiteRegistros;
             }
 
             document.getElementById('buscar').click();  // buscar  
@@ -49,13 +63,27 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
             break;
         case 'ultima':
 
-        // todo falta obtener el total de paginas 
+
             paginaActual = totalPaginas;
-            console.log(`estas en  ${paginaActual}`);
+            registroInicio = (totalPaginas - 1) * totalRegistros;
+
+
+
+            registroInicio = (paginaActual - 1) * limiteRegistros;
+
+            // calculamos el limite de registros a mostrar
+            limimitRegistros = totalRegistros - registroInicio;
+            document.getElementById('buscar').click();  // buscar
+
+            //seteamos el limite de registros a 10 para la sieguiente consulta
+            limiteRegistros = 10;
+
+
+
             break;
     }
 
-    
+
 });
 
 // Cargar la pagina inicial

@@ -47,36 +47,47 @@ class Paciente
     //  Obtener todos los pacientes de la base de datos filtrando y poniendo limites
 
     public static function obtenerPacientes($pdo, $filtros = [])
-    {
-        $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
-        $parametros = [];
+{
+    $sql = "SELECT sip, dni, nombre, apellido1 FROM pacientes";
+    $parametros = [];
 
-        // limitamos los resultados si se proporcionan los parámetros limit y offset
-        $limit = isset($filtros['limit']) ? $filtros['limit'] : 10;
-        $offset = isset($filtros['offset']) ? $filtros['offset'] : 0;
+    // Create a separate SQL query to get the total count of records
+    $sqlCount = "SELECT COUNT(*) FROM pacientes";
 
-        if (!empty($filtros)) {
-            $clausulas = [];
-            foreach ($filtros as $campo => $valor) {
-                if ($campo !== 'limit' && $campo !== 'offset') {
-                    $clausulas[] = "$campo = ?";
-                    $parametros[] = $valor;
-                }
-            }
-            if (!empty($clausulas)) {
-                $sql .= " WHERE " . implode(' AND ', $clausulas);
+    if (!empty($filtros)) {
+        $clausulas = [];
+        foreach ($filtros as $campo => $valor) {
+            if ($campo !== 'limit' && $campo !== 'offset') {
+                $clausulas[] = "$campo = ?";
+                $parametros[] = $valor;
             }
         }
-
-        // Add LIMIT and OFFSET clauses outside of the if condition
-        $sql .= " LIMIT $limit OFFSET $offset";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($parametros);
-
-        return $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
+        if (!empty($clausulas)) {
+            $sql .= " WHERE " . implode(' AND ', $clausulas);
+            $sqlCount .= " WHERE " . implode(' AND ', $clausulas);
+        }
     }
 
+    // Execute the SQL query to get the total count of records
+    $stmtCount = $pdo->prepare($sqlCount);
+    $stmtCount->execute($parametros);
+    $regCount = $stmtCount->fetchColumn();
+
+    // limitamos los resultados si se proporcionan los parámetros limit y offset
+    $limit = isset($filtros['limit']) ? $filtros['limit'] : 10;
+    $offset = isset($filtros['offset']) ? $filtros['offset'] : 0;
+
+    // añadimos limit y offset a la consulta
+    $sql .= " LIMIT $limit OFFSET $offset";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($parametros);
+
+    $pacientes = $stmt->fetchAll(PDO::FETCH_CLASS, 'Paciente');
+
+    // Return the patients and the total count of records
+    return ['pacientes' => $pacientes, 'regCount' => $regCount];
+}
     // Actualizar datos del paciente en la base de datos, si no existe lo crea
     public static function actualizar($pdo, $paciente)
     {
