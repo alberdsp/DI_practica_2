@@ -105,11 +105,7 @@ function realizarBusqueda(limit, offset) {
             }
         })
 
-
-
-        
-
-    
+  
         
         .then(data => {
             // console.log(data); // Imprimir para depuración

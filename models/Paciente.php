@@ -51,7 +51,7 @@ class Paciente
         }
     }
 
-    // Execute the SQL query to get the total count of records
+    // Hacemos la consulta para obtener el total de registros
     $stmtCount = $pdo->prepare($sqlCount);
     $stmtCount->execute($parametros);
     $regCount = $stmtCount->fetchColumn();

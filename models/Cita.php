@@ -67,7 +67,7 @@ class Cita
 
     public static function obtenerCitas($pdo, $filtros = [])
     {
-        $sql = "SELECT id, fecha, medico_id, paciente_id FROM citas";
+        $sql = "SELECT id, fecha, paciente_id, medico_id FROM citas";
         $parametros = [];
 
         // Create a separate SQL query to get the total count of records
@@ -85,6 +85,12 @@ class Cita
             $sqlCount .= ' WHERE ' . implode(' AND ', $clausulas);
         }
 
+            // Hacemos la consulta para obtener el total de registros
+    $stmtCount = $pdo->prepare($sqlCount);
+    $stmtCount->execute($parametros);
+    $regCount = $stmtCount->fetchColumn();
+
+    
         // Añadimos los limites a la consulta
         if (isset($filtros['limit'])) {
             $sql .= ' LIMIT ' . $filtros['limit'];
@@ -105,7 +111,7 @@ class Cita
         $stmt->execute($parametros);
         $total = $stmt->fetchColumn();
 
-        return ['citas' => $citas, 'total' => $total];
+        return ['citas' => $citas, 'regCount' => $regCount];
     }
 
     // Elimitar una cita de la base de datos

@@ -206,8 +206,8 @@ function mostrarCitas(respuesta) {
             // Crear y añadir celdas para los detalles del cita
             fila.appendChild(crearCelda(cita.id));
             fila.appendChild(crearCelda(cita.fecha));
-            fila.appendChild(crearCelda(cita.cita));
-            fila.appendChild(crearCelda(cita.medico));
+            fila.appendChild(crearCelda(cita.paciente_id));
+            fila.appendChild(crearCelda(cita.medico_id));
 
             // Crear celda para los botones
             const celdaBotones = document.createElement('td');
