@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="es" data-bs-theme="auto">
 
+<?php
+
+$id= '';
+$fecha = '';
+$paciente = '';
+$medico= '';
+?>
+
 <head>
   <script src="vendor/js/color-modes.js"></script>
 
@@ -12,7 +20,6 @@
   <title>Gestión Hospital</title>
 
   <link rel="icon" href="img/icono.png" type="image/x-icon">
-
   <link href="css/bootstrap.min.css" rel="stylesheet">
 
 
@@ -37,13 +44,13 @@
       <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="citas_list.html">Citas</a>
+            <a class="nav-link active" href="citas_list.html">Citas</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="medicos_list.html">Médicos</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="pacientes_list.html">Pacientes</a>
+            <a class="nav-link " aria-current="page" href="pacientes_list.html">Pacientes</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="index.html">Salir</a>
@@ -56,71 +63,67 @@
   </nav>
 
 
-
   <!-- Contenedor superior de título central  -->
 
   <main class="container">
     <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
 
       <div class="lh-1">
-        <h1 class="h6 mb-0 text-white lh-1">Mantenimiento de citas</h1>
+        <h1 class="h6 mb-0 text-white lh-1">Mantenimiento de Citas</h1>
 
       </div>
     </div>
 
     <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
 
+
+      <!-- formulario de filtros  -->
+
       <div class="lh-1">
-        <h1 class="h6 mb-0 text-white lh-1">Filtros</h1>
-
+        <form id='filtroForm' class="form">
+          <label for="id"><Label>ID.</Label>:</label>
+          <input type="text" id="id" name="id" value="">
+          <label for="fecha">Fecha:</label>
+          <input type="date" id="fecha" name="fecha" value="">
+          <label for="paciente">Paciente:</label>
+          <input type="text" id="paciente" name="paciente" value="" list="paciente-list">
+          <datalist id="paciente-list"></datalist>
+          <label for="medico">Medico:</label>
+          <input type="text" id="medico" name="medico" value="">
+          <button class="btn btn-primary mr-2" type="submit" id="buscar">Buscar</button>
+          <button class="btn btn-success text-light mr-2" type="insertar" id="insertar">Insertar</button>
+          <button class="btn btn-warning mr-2" type="limpiar" id="limpiar">Limpiar</button>
+        </form>
       </div>
     </div>
 
-    <div class="my-3 p-3 bg-body rounded shadow-sm">
+    <div id='lista_medicos' class="my-3 p-3 bg-body rounded shadow-sm">
 
-      <!-- Nombre del listado  -->
+      <!-- paciente del listado  -->
       <h6 class="border-bottom pb-2 mb-0">Listado de citas</h6>
-      <div class="d-flex text-body-secondary pt-3">
-        <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-          <div class="d-flex justify-content-between">
-            <strong class="text-gray-dark">Full Name</strong>
-            <a href="#">Follow</a>
-          </div>
-          <span class="d-block"></span>
-        </div>
-      </div>
+      <div id='lista_medicos2' class="d-flex text-body-secondary pt-3">
 
-      <div class="d-flex text-body-secondary pt-3">
-        <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-          <div class="d-flex justify-content-between">
-            <strong class="text-gray-dark">Full Name</strong>
-            <a href="#">Follow</a>
-          </div>
-          <span class="d-block"></span>
-        </div>
-      </div>
-
-      <div class="d-flex text-body-secondary pt-3">
-        <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
-          <div class="d-flex justify-content-between">
-            <strong class="text-gray-dark">Full Name</strong>
-            <a href="#">Follow</a>
-          </div>
-          <span class="d-block"></span>
-        </div>
       </div>
 
 
-      <small class="d-block text-end mt-3">
-        <a href="#">Ver todos</a>
-      </small>
     </div>
+    <nav aria-label="ejemplo de paginación">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#" data-action="primera"><<</a></li>
+        <li class="page-item"><a class="page-link" href="#" data-action="anterior"><</a></li>
+        <li class="page-item"><a class="page-link" href="#" data-action="siguiente">></a></li>
+        <li class="page-item"><a class="page-link" href="#" data-action="ultima">>></a></li>
+        <li id="detalleregistros" class="col-sm-3"></li>
+
+      </ul>
+    </nav>
+
   </main>
+
   <script src="vendor/js/bootstrap.bundle.min.js"></script>
-
   <script src="vendor/js/offcanvas-navbar.js"></script>
+  <script src="controllers/citas_list.js"></script>
+  <script src="controllers/paginador.js"></script>
 </body>
-
-
 
 </html>

@@ -24,23 +24,6 @@ class Paciente
     }
 
 
-    // Método mágico GET
-    public function __get($property)
-    {
-        if (property_exists($this, $property)) {
-            return $this->$property;
-        }
-    }
-
-    // Método mágico SET
-    public function __set($property, $value)
-    {
-        if (property_exists($this, $property)) {
-            $this->$property = $value;
-        }
-        return $this;
-    }
-
     // Métodos para el manejo de la base de datos
 
 
