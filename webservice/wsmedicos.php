@@ -2,13 +2,13 @@
 
 /**
  * ABF 2023
- * api CRUD de pacientes, mediante Metodo GET,POST,PUT y DELETE
+ * api CRUD de medicos, mediante Metodo GET,POST,PUT y DELETE
  * recibimos y enviamos en formato JSON 
  */
 
-// incluimos config con la bd y clase paciente
+// incluimos config con la bd y clase Medico
 include '../config.php';
-include '../models/Paciente.php';
+include '../models/Medico.php';
 include '../validar_token.php';
 
 header('Content-Type: application/json');
@@ -72,16 +72,16 @@ if ($autenticado) {
             case 'POST':
                 $data = json_decode(file_get_contents('php://input'), true);
             
-                $result = Paciente::obtenerPacientes($pdo, $data);
+                $result = Medico::obtenerMedicos($pdo, $data);
             
                 // Prepare the data for the JSON response
                 $respuesta = [];
-                foreach ($result['pacientes'] as $paciente) {
+                foreach ($result['medicos'] as $medico) {
                     $respuesta[] = [
-                        'sip' => isset($paciente->sip) ? $paciente->sip : null,
-                        'dni' => isset($paciente->dni) ? $paciente->dni : null,
-                        'nombre' => isset($paciente->nombre) ? $paciente->nombre : null,
-                        'apellido1' => isset($paciente->apellido1) ? $paciente->apellido1 : null
+                        'numero_colegiado' => isset($medico->numero_colegiado) ? $medico->numero_colegiado : null,
+                        'dni' => isset($medico->dni) ? $medico->dni : null,
+                        'nombre' => isset($medico->nombre) ? $medico->nombre : null,
+                        'apellido1' => isset($medico->apellido1) ? $medico->apellido1 : null
                     ];
                 }
             
@@ -97,17 +97,17 @@ if ($autenticado) {
 
                 if (isset($data['dni'])) {
                     try {
-                        $paciente = new Paciente();
-                        $paciente->sip = isset($data['sip']) ? $data['sip'] : null;
-                        $paciente->dni = $data['dni'];
-                        $paciente->nombre = isset($data['nombre']) ? $data['nombre'] : null;
-                        $paciente->apellido1 = isset($data['apellido1']) ? $data['apellido1'] : null;
+                        $medico = new Medico();
+                        $medico->numero_colegiado = isset($data['numero_colegiado']) ? $data['numero_colegiado'] : null;
+                        $medico->dni = $data['dni'];
+                        $medico->nombre = isset($data['nombre']) ? $data['nombre'] : null;
+                        $medico->apellido1 = isset($data['apellido1']) ? $data['apellido1'] : null;
 
-                        $resultado = Paciente::actualizar($pdo, $paciente);
+                        $resultado = Medico::actualizar($pdo, $medico);
 
                         echo json_encode(['result' => $resultado]);
                     } catch (Exception $e) {
-                        error_log("Exception capturada Paciente::actualizar: " . $e->getMessage());
+                        error_log("Exception capturada Medico::actualizar: " . $e->getMessage());
                         throw $e;
                     }
                 } else {
@@ -124,9 +124,9 @@ if ($autenticado) {
                 if (isset($data['dni'])) {
                     error_log("DNI received: " . $data['dni']);  // Log  DNI
                     try {
-                        $resultado = Paciente::eliminar($pdo, $data['dni']);
+                        $resultado = Medico::eliminar($pdo, $data['dni']);
                     } catch (Exception $e) {
-                        error_log("Exception capturada Paciente::eliminar: " . $e->getMessage());  // Log mensaje de error
+                        error_log("Exception capturada Medico::eliminar: " . $e->getMessage());  // Log mensaje de error
                         throw $e;  // Re-throw excepción para que el controlador la capture
                     }
                 } else {
