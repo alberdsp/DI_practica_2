@@ -73,8 +73,8 @@ if ($autenticado) {
                 $data = json_decode(file_get_contents('php://input'), true);
             
                 $result = Medico::obtenerMedicos($pdo, $data);
-            
-                // Prepare the data for the JSON response
+          
+                // prepara el resultado para el JSON
                 $respuesta = [];
                 foreach ($result['medicos'] as $medico) {
                     $respuesta[] = [
@@ -85,7 +85,7 @@ if ($autenticado) {
                     ];
                 }
             
-                // Add the total number of records to the result
+                // añadimos el total de registros para el paginador
                 echo json_encode(['data' => $respuesta, 'total_registros' => $result['regCount']]);
                 break;
 
@@ -127,7 +127,7 @@ if ($autenticado) {
                         $resultado = Medico::eliminar($pdo, $data['dni']);
                     } catch (Exception $e) {
                         error_log("Exception capturada Medico::eliminar: " . $e->getMessage());  // Log mensaje de error
-                        throw $e;  // Re-throw excepción para que el controlador la capture
+                        throw $e;  // throw la escepción para que el controlador la capture
                     }
                 } else {
                     http_response_code(400);

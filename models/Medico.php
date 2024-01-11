@@ -10,19 +10,20 @@
  class Medico
  {
 
-     private $numero_colegiado;
-     private $dni;
-     private $nombre;
-     private $telefono;
+     public $numero_colegiado;
+     public $dni;
+     public $nombre;
+     public $apellido1;
+     public $especialidad_id;
  
      // Constructor
-     function __construct( $numero_colegiado = null, $dni = null, $nombre = null, $telefono = null)
+     function __construct( $numero_colegiado = null, $dni = null, $nombre = null, $apellido1 = null)
      {
          if (func_num_args() > 0) {
              $this->numero_colegiado = $numero_colegiado;
              $this->dni = $dni;
              $this->nombre = $nombre;
-             $this->telefono = $telefono;
+             $this->apellido1 = $apellido1;
          }
      }
  
@@ -89,7 +90,7 @@
 
     $medicos = $stmt->fetchAll(PDO::FETCH_CLASS, 'Medico');
 
-    var_dump($medicos);
+
 
     // devuelvo un array con los medicos y el total de registros
     return ['medicos' => $medicos, 'regCount' => $regCount];
@@ -123,9 +124,9 @@
                 return true;
             } else {
                 // si no existe el medico lo creamos
-                $sql = "INSERT INTO medicos (numero_colegiado, dni, nombre, apellido1) VALUES (?, ?, ?, ?)";
+                $sql = "INSERT INTO medicos (numero_colegiado, dni, nombre, apellido1,especialidad_id) VALUES (?, ?, ?, ?, 1)";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$medico->numero_colegiado, $medico->dni, $medico->nombre, $medico->apellido1]);
+                $stmt->execute([$medico->numero_colegiado, $medico->dni, $medico->nombre, $medico->apellido1, $medico->especialidad_id]);
                 $pdo->commit();
                 return  true;
             }
@@ -138,6 +139,7 @@
 
 
 
+ 
     // función para eliminar medico y todas sus foreing keys
     public static function eliminar($pdo, $dni)
     {
@@ -154,6 +156,7 @@
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$dni]);
             $medico = $stmt->fetch(PDO::FETCH_ASSOC);
+           
 
             if ($medico) {
                 // obtenemos id de medico
@@ -162,23 +165,37 @@
                 $stmt->execute([$medico['id']]);
                 $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+                //echo var_dump($citas[0]['id']); 
+
                 foreach ($citas as $cita) {
                     // borramos los tratamientos de cada cita del medico
                     $sql = "DELETE FROM tratamientos WHERE cita_id = ?";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute([$cita['id']]);
+
+                    //echo var_dump($cita['id']);
                 }
+
+                 
 
                 // borramos las citas del medico
                 $sql = "DELETE FROM citas WHERE medico_id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$medico['id']]);
 
+           
+               
+                // establecemos el medico a null en los pacientes
+                $sql = "UPDATE pacientes SET medico_id = null WHERE medico_id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$medico['id']]);
+                         
+
                 // borramos al medico
                 $sql = "DELETE FROM medicos WHERE dni = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$dni]);
-
+                  
                 // realizamos la transacción
                 $pdo->commit();
 

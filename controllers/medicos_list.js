@@ -96,7 +96,7 @@ function realizarBusqueda(limit, offset) {
         body: JSON.stringify(filtrarYPrepararDatos(filtros))
     })
 
-    /*
+    
         .then(response => {
             if (response.headers.get("content-type").includes("application/json")) {
                 return response.json();
@@ -107,19 +107,10 @@ function realizarBusqueda(limit, offset) {
 
 
 
-        */
+        
 
-        .then(response => {
-            if (response.headers.get("content-type").includes("application/json")) {
-                return response.text()
-                    .then(text => {
-                        console.log(text);
-                        return JSON.parse(text);
-                    });
-            } else {
-                return response.text().then(text => { throw new Error(text) });
-            }
-        })
+    
+        
         .then(data => {
             // console.log(data); // Imprimir para depuración
 
