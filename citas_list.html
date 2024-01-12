@@ -63,6 +63,8 @@ $medico= '';
   </nav>
 
 
+
+
   <!-- Contenedor superior de título central  -->
 
   <main class="container">
@@ -86,10 +88,10 @@ $medico= '';
           <label for="fecha">Fecha:</label>
           <input type="datetime-local" id="fecha" name="fecha" value="">
           <label for="paciente">Paciente:</label>
-          <input type="text" id="paciente" name="paciente" value="" list="paciente-list">
+          <input type="text" id="paciente" name="paciente_id" value="" list="paciente-list">
           <datalist id="paciente-list"></datalist>
           <label for="medico">Medico:</label>
-          <input type="text" id="medico" name="medico" value="">
+          <input type="text" id="medico" name="medico_id" value="">
           <button class="btn btn-primary mr-2" type="submit" id="buscar">Buscar</button>
           <button class="btn btn-success text-light mr-2" type="insertar" id="insertar">Insertar</button>
           <button class="btn btn-warning mr-2" type="limpiar" id="limpiar">Limpiar</button>

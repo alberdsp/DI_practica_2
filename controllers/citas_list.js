@@ -29,29 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // raliar la busqueda con los datos del formulario y limites de la paginación
         realizarBusqueda(limiteRegistros,registroInicio);
+      
+
     });
 });
-
-// obtenemos el paciente introducido en el input y realizamos la busqueda
-document.getElementById('paciente').addEventListener('input', function() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('post', 'wscitas.php?query=' + this.value, true);
-    xhr.onload = function() {
-        if (this.status == 200) {
-            var results = JSON.parse(this.responseText);
-            var datalist = document.getElementById('paciente-list');
-            datalist.innerHTML = '';
-            for (var i = 0; i < results.length; i++) {
-                var option = document.createElement('option');
-                option.value = results[i].id;
-                option.textContent = results[i].name;
-                datalist.appendChild(option);
-            }
-        }
-    };
-    xhr.send();
-});
-
 
 
 
@@ -67,7 +48,7 @@ document.getElementById('limpiar').addEventListener('click', (event) => {
 // listener para el boton de insertar
 document.getElementById('insertar').addEventListener('click', async (event) => {
     event.preventDefault();
-    let id = document.getElementById('id').value;
+   // let id = document.getElementById('id').value;
     let fecha = document.getElementById('fecha').value;
     let paciente = document.getElementById('paciente').value;
     let medico = document.getElementById('medico').value;
@@ -95,7 +76,7 @@ document.getElementById('insertar').addEventListener('click', async (event) => {
 
 
 function realizarBusqueda(limit, offset) {
-    // Captura del token de la sesión
+     // Captura del token de la sesión
     let token = sessionStorage.getItem('token_hospital_gest');
 
     // Preparación de los datos del formulario
@@ -104,11 +85,12 @@ function realizarBusqueda(limit, offset) {
     formData.forEach((value, key) => { filtros[key] = value; });
 
     // añadimos los limites de la consulta
+    //filtros.fecha = filtros.fecha + ":00"; // Add ":00" to the end to represent seconds
     filtros.limit = limit;
     filtros.offset = offset;
 
 
-
+   
     // Solicitud Fetch al servidor
     fetch('webservice/wscitas.php', {
         method: 'POST',
@@ -117,13 +99,19 @@ function realizarBusqueda(limit, offset) {
             'Authorization': 'Bearer ' + token  // Token real aquí
         },
         body: JSON.stringify(filtrarYPrepararDatos(filtros))
-    })
 
+       
+        //body: JSON.stringify(filtros)
+    })
+        
     
         .then(response => {
             if (response.headers.get("content-type").includes("application/json")) {
+                console.log(JSON.stringify(filtrarYPrepararDatos(filtros)))
+               
                 return response.json();
             } else {
+                console.log(JSON.stringify(filtrarYPrepararDatos(filtros)))
                 return response.text().then(text => { throw new Error(text) });
             }
         })
@@ -164,7 +152,7 @@ function buscarCita(fecha) {
         })
         .then(data => {
             // console.log(data); // Imprimir para depuración
-            mostrarMedicos(data);
+            mostrarCitas(data);
             return data;
         })
         .catch(error => {
@@ -198,6 +186,9 @@ function mostrarCitas(respuesta) {
     const tabla = document.createElement('table');
     tabla.classList.add('table');
 
+
+// si la respuesta es correcta y el array no esta vacio
+
     if (respuesta && Array.isArray(respuesta.data)) {
         respuesta.data.forEach(cita => {
             // Crear una fila para cada cita
@@ -228,9 +219,9 @@ function mostrarCitas(respuesta) {
             const botonBorrar = document.createElement('button');
             botonBorrar.innerText = 'Borrar';
             botonBorrar.classList.add('btn', 'btn-danger', 'mr-2');
-            botonBorrar.setAttribute('data-fecha', cita.fecha);
+            botonBorrar.setAttribute('data-id', cita.id);
             botonBorrar.onclick = function () {
-                borrarCita(this.getAttribute('data-fecha'));
+                borrarCita(this.getAttribute('data-id'));
             };
 
 
@@ -253,7 +244,7 @@ function mostrarCitas(respuesta) {
 
     } else {
         console.error('Se esperaba un objeto con una propiedad "data" que es un array, pero se recibió:', respuesta);
-        contenedor.innerText = 'No se pudieron cargar los datos de los medicos.';
+        contenedor.innerText = 'No se pudieron cargar los datos de las citas.';
     }
 
 
@@ -427,7 +418,7 @@ function borrarCita(id) {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token  // Token real aquí
         },
-        body: JSON.stringify({ id: id }) // enviar acción y fecha en el cuerpo
+        body: JSON.stringify({ id: id }) // enviar acción e id en el cuerpo
     })
         .then(response => {
             if (!response.ok) {

@@ -13,50 +13,17 @@ class Cita
     public $paciente_id;
 
     // Constructor
-    public function __construct($id, $fecha, $medico_id, $paciente_id)
+    public function __construct($fecha = null, $medico_id = null, $paciente_id = null)
     {
-        $this->setId($id);
-        $this->setFecha($fecha);
-        $this->setMedicoId($medico_id);
-        $this->setPacienteId($paciente_id);
+        if (func_num_args() > 0) {
+            $this->fecha = $fecha;
+            $this->medico_id = $medico_id;
+            $this->paciente_id = $paciente_id;
+        }
+          
+
     }
 
-    // Getters y Setters para cada propiedad
-    public function getId()
-    {
-        return $this->id;
-    }
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    public function getFecha()
-    {
-        return $this->fecha;
-    }
-    public function setFecha($fecha)
-    {
-        $this->fecha = $fecha;
-    }
-
-    public function getMedicoId()
-    {
-        return $this->medico_id;
-    }
-    public function setMedicoId($medico_id)
-    {
-        $this->medico_id = $medico_id;
-    }
-
-    public function getPacienteId()
-    {
-        return $this->paciente_id;
-    }
-    public function setPacienteId($paciente_id)
-    {
-        $this->paciente_id = $paciente_id;
-    }
 
 
     // Métodos para el manejo de la base de datos
@@ -65,6 +32,7 @@ class Cita
 
 
 
+    
     public static function obtenerCitas($pdo, $filtros = [])
     {
         $sql = "SELECT id, fecha, paciente_id, medico_id FROM citas";
@@ -77,12 +45,14 @@ class Cita
             $clausulas = [];
             foreach ($filtros as $campo => $valor) {
                 if ($campo !== 'limit' && $campo !== 'offset') {
-                    $clausulas[] = "$campo = :$campo";
-                    $parametros[$campo] = $valor;
+                    $clausulas[] = "$campo = ?";
+                    $parametros[] = $valor;
                 }
             }
-            $sql .= ' WHERE ' . implode(' AND ', $clausulas);
-            $sqlCount .= ' WHERE ' . implode(' AND ', $clausulas);
+            if (!empty($clausulas)) {
+                $sql .= " WHERE " . implode(' AND ', $clausulas);
+                $sqlCount .= " WHERE " . implode(' AND ', $clausulas);
+            }
         }
 
             // Hacemos la consulta para obtener el total de registros
@@ -91,29 +61,30 @@ class Cita
     $regCount = $stmtCount->fetchColumn();
 
     
-        // Añadimos los limites a la consulta
-        if (isset($filtros['limit'])) {
-            $sql .= ' LIMIT ' . $filtros['limit'];
-        }
-        if (isset($filtros['offset'])) {
-            $sql .= ' OFFSET ' . $filtros['offset'];
-        }
+ 
+    // limitamos los resultados si se proporcionan los parámetros limit y offset
+    $limit = isset($filtros['limit']) ? $filtros['limit'] : 10;
+    $offset = isset($filtros['offset']) ? $filtros['offset'] : 0;
 
-        // preparar la consulta
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($parametros);
+    // añadimos limit y offset a la consulta
+    $sql .= " LIMIT $limit OFFSET $offset";
 
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($parametros);
         // Fech los resultados
-        $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+      //  $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $citas = $stmt->fetchAll(PDO::FETCH_CLASS, 'Cita');    
         // Obtener el total de registros
-        $stmt = $pdo->prepare($sqlCount);
-        $stmt->execute($parametros);
-        $total = $stmt->fetchColumn();
-
+      //  $stmt = $pdo->prepare($sqlCount);
+     //   $stmt->execute($parametros);
+     
         return ['citas' => $citas, 'regCount' => $regCount];
     }
 
+
+
+
+    
     // Elimitar una cita de la base de datos
     public static function eliminar($pdo, $id)
     {
@@ -199,4 +170,12 @@ class Cita
             throw $e;
         }
     }
+
+
+
+
+
+
+
+    
 }

@@ -110,7 +110,6 @@ function realizarBusqueda(limit, offset) {
         .then(data => {
             // console.log(data); // Imprimir para depuración
 
-            console.log(data);
             mostrarMedicos(data);
         })
         .catch(error => console.error('Error:', error));

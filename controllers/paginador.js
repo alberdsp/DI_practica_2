@@ -27,7 +27,7 @@ function obtenerTotalPaginas(totalRegistros) {
 }
 
 
-// Listeners para los botones
+// Listeners para los botones de paginacion
 document.querySelector('.pagination').addEventListener('click', (event) => {
 
     event.preventDefault();
@@ -39,7 +39,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
             paginaActual = 1;
             registroInicio = 0;
             document.getElementById('buscar').click();  // buscar  
-            console.log(`estas en  ${paginaActual}`);
+      
             break;
         case 'anterior':
             if (paginaActual > 1) {
@@ -48,7 +48,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
             }
 
             //  registroInicio = 1;
-            console.log(`estas en  ${paginaActual}`);
+        
             document.getElementById('buscar').click();  // buscar   
 
             break;
@@ -59,7 +59,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
             }
 
             document.getElementById('buscar').click();  // buscar  
-            console.log(`estas en  ${paginaActual}`);
+          
             break;
         case 'ultima':
 

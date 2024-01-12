@@ -71,6 +71,12 @@ class Paciente
     // Return the patients and the total count of records
     return ['pacientes' => $pacientes, 'regCount' => $regCount];
 }
+
+
+
+
+
+
     // Actualizar datos del paciente en la base de datos, si no existe lo crea
     public static function actualizar($pdo, $paciente)
     {

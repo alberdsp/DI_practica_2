@@ -75,14 +75,17 @@ if ($autenticado) {
             
                 $result = Cita::obtenerCitas($pdo, $data);
               
+
+            
                 // prepara el resultado para el JSON
                 $respuesta = [];
                 foreach ($result['citas'] as $cita) {
                     $respuesta[] = [
-                        'id' => isset($cita['id']) ? $cita['id'] : null,
-                        'fecha' => isset($cita['fecha']) ? $cita['fecha'] : null,
-                        'paciente_id' => isset($cita['paciente_id']) ? $cita['paciente_id'] : null,
-                        'medico_id' => isset($cita['medico_id']) ? $cita['medico_id'] : null
+                        'id' => isset($cita->id) ? $cita->id : null,
+                        'fecha' => isset($cita->fecha) ? $cita->fecha : null,
+                        'paciente_id' => isset($cita->paciente_id) ? $cita->paciente_id : null,
+                        'medico_id' => isset($cita->medico_id) ? $cita->medico_id : null,
+
                     ];
                 }
             
@@ -122,17 +125,17 @@ if ($autenticado) {
                 error_log("DELETE request received");
                 $data = json_decode(file_get_contents('php://input'), true);
 
-                if (isset($data['fecha'])) {
-                    error_log("fecha received: " . $data['fecha']);  // Log  fecha
+                if (isset($data['id'])) {
+                    error_log("id received: " . $data['id']);  // Log  fecha
                     try {
-                        $resultado = Cita::eliminar($pdo, $data['fecha']);
+                        $resultado = Cita::eliminar($pdo, $data['id']);
                     } catch (Exception $e) {
                         error_log("Exception capturada cita::eliminar: " . $e->getMessage());  // Log mensaje de error
                         throw $e;  // throw la escepción para que el controlador la capture
                     }
                 } else {
                     http_response_code(400);
-                    echo json_encode(['error' => 'fecha no proporcionado']);
+                    echo json_encode(['error' => 'id no proporcionado']);
                 }
                 break;
 
