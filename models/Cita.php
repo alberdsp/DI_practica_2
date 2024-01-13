@@ -33,7 +33,7 @@ class Cita
 
     public static function obtenerCitas($pdo, $filtros = [])
     {
-        $sql = "SELECT id, fecha, paciente_id, medico_id FROM citas";
+        $sql = "SELECT pacientes.id as id, fecha, pacientes.nombre as paciente_id, medicos.nombre as medico_id FROM citas left join pacientes on citas.paciente_id = pacientes.id left join medicos on citas.medico_id = medicos.id";
         $parametros = [];
 
         // Create a separate SQL query to get the total count of records
@@ -159,7 +159,7 @@ class Cita
 
 
                 // si no existe el cita lo creamos
-                $sql = "INSERT INTO citas (fecha, paciente_id, medico_id) VALUES (?, ?, ?,)";
+                $sql = "INSERT INTO citas (fecha, paciente_id, medico_id) VALUES (?, ?, ?)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$cita->fecha, $cita->paciente_id, $cita->medico_id]);
                 $pdo->commit();
