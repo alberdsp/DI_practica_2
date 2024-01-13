@@ -71,10 +71,10 @@ if ($autenticado) {
         switch ($method) {
             case 'POST':
                 $data = json_decode(file_get_contents('php://input'), true);
-            
+
                 $result = Paciente::obtenerPacientes($pdo, $data);
-            
-                // Prepare the data for the JSON response
+
+                // Prepara la respuesta
                 $respuesta = [];
                 foreach ($result['pacientes'] as $paciente) {
                     $respuesta[] = [
@@ -84,8 +84,8 @@ if ($autenticado) {
                         'apellido1' => isset($paciente->apellido1) ? $paciente->apellido1 : null
                     ];
                 }
-            
-                // Add the total number of records to the result
+
+                // añadimos el total de registros
                 echo json_encode(['data' => $respuesta, 'total_registros' => $result['regCount']]);
                 break;
 

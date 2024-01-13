@@ -18,11 +18,11 @@ function obtenerTotalPaginas(totalRegistros) {
 
     totalPaginas = Math.ceil(totalRegistros / limiteRegistros);
 
-// instertamos el total de paginas, pagina actual y nº de registros  en el elemento html
+    // instertamos el total de paginas, pagina actual y nº de registros  en el elemento html
 
- 
-    document.getElementById('detalleregistros').innerHTML = "  *  " + totalRegistros + "  registros -   " + 
-    "  página " + paginaActual + " de " + totalPaginas;
+
+    document.getElementById('detalleregistros').innerHTML = "  *  " + totalRegistros + "  registros -   " +
+        "  página " + paginaActual + " de " + totalPaginas;
 
 }
 
@@ -33,13 +33,13 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
     event.preventDefault();
 
     const action = event.target.getAttribute('data-action');
-    console.log(`Action: ${action}`); // Add this line
+
     switch (action) {
         case 'primera':
             paginaActual = 1;
             registroInicio = 0;
             document.getElementById('buscar').click();  // buscar  
-      
+
             break;
         case 'anterior':
             if (paginaActual > 1) {
@@ -48,7 +48,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
             }
 
             //  registroInicio = 1;
-        
+
             document.getElementById('buscar').click();  // buscar   
 
             break;
@@ -59,7 +59,7 @@ document.querySelector('.pagination').addEventListener('click', (event) => {
             }
 
             document.getElementById('buscar').click();  // buscar  
-          
+
             break;
         case 'ultima':
 

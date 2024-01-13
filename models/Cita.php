@@ -70,11 +70,9 @@ class Cita
         $stmt = $pdo->prepare($sql);
         $stmt->execute($parametros);
         // Fech los resultados
-        //  $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   
         $citas = $stmt->fetchAll(PDO::FETCH_CLASS, 'Cita');
-        // Obtener el total de registros
-        //  $stmt = $pdo->prepare($sqlCount);
-        //   $stmt->execute($parametros);
+
 
         return ['citas' => $citas, 'regCount' => $regCount];
     }

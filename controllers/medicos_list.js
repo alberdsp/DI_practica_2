@@ -17,7 +17,7 @@ let token = sessionStorage.getItem('token_hospital_gest');
 
 // Si el token no existe redirigimos al login
 if (!token) {
-    window.location.href = './index.html'; 
+    window.location.href = './index.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // raliar la busqueda con los datos del formulario y limites de la paginación
-        realizarBusqueda(limiteRegistros,registroInicio);
+        realizarBusqueda(limiteRegistros, registroInicio);
     });
 });
 
@@ -96,7 +96,7 @@ function realizarBusqueda(limit, offset) {
         body: JSON.stringify(filtrarYPrepararDatos(filtros))
     })
 
-    
+
         .then(response => {
             if (response.headers.get("content-type").includes("application/json")) {
                 return response.json();
@@ -105,10 +105,10 @@ function realizarBusqueda(limit, offset) {
             }
         })
 
-  
-        
+
+
         .then(data => {
-            // console.log(data); // Imprimir para depuración
+
 
             mostrarMedicos(data);
         })
@@ -293,7 +293,7 @@ function editarPaciente(dni) {
 
             // botón de cancelar
             let botonCancelar = document.createElement('button');
-            botonCancelar.id = 'botonCancelar'; // Assign the ID
+            botonCancelar.id = 'botonCancelar'; // Asignamos ID
             botonCancelar.innerText = 'Cancelar';
             botonCancelar.classList.add('btn', 'btn-primary', 'mr-2');
             botonCancelar.onclick = function () {

@@ -19,7 +19,7 @@ let token = sessionStorage.getItem('token_hospital_gest');
 
 // Si el token no existe redirigimos al login
 if (!token) {
-    window.location.href = './index.html'; 
+    window.location.href = './index.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // raliar la busqueda con los datos del formulario y limites de la paginación
-        realizarBusqueda(limiteRegistros,registroInicio);
-      
+        realizarBusqueda(limiteRegistros, registroInicio);
+
 
     });
 });
@@ -55,7 +55,7 @@ document.getElementById('insertar').addEventListener('click', async (event) => {
 
 
     // promesa asyncrona para recibir los datos si existe cita
-    let response = await buscarCita(id,fecha, paciente_id, medico_id);
+    let response = await buscarCita(id, fecha, paciente_id, medico_id);
 
     // si existe cita para ese paciente mostramos un mensaje de alerta
     if (response.data && response.data.length > 0) {
@@ -66,7 +66,7 @@ document.getElementById('insertar').addEventListener('click', async (event) => {
 
         // finalemnte si no existe el cita y los campos no estan vacios insertamos
     } else {
-        guardarCita(id,fecha, paciente_id, medico_id);
+        guardarCita(id, fecha, paciente_id, medico_id);
     }
 });
 
@@ -76,7 +76,7 @@ document.getElementById('insertar').addEventListener('click', async (event) => {
 
 
 function realizarBusqueda(limit, offset) {
-     // Captura del token de la sesión
+    // Captura del token de la sesión
     let token = sessionStorage.getItem('token_hospital_gest');
 
     // Preparación de los datos del formulario
@@ -85,12 +85,12 @@ function realizarBusqueda(limit, offset) {
     formData.forEach((value, key) => { filtros[key] = value; });
 
     // añadimos los limites de la consulta
-    //filtros.fecha = filtros.fecha + ":00"; // Add ":00" to the end to represent seconds
+
     filtros.limit = limit;
     filtros.offset = offset;
 
 
-   
+
     // Solicitud Fetch al servidor
     fetch('webservice/wscitas.php', {
         method: 'POST',
@@ -100,15 +100,15 @@ function realizarBusqueda(limit, offset) {
         },
         body: JSON.stringify(filtrarYPrepararDatos(filtros))
 
-       
-        //body: JSON.stringify(filtros)
+
+
     })
-        
-    
+
+
         .then(response => {
             if (response.headers.get("content-type").includes("application/json")) {
                 console.log(JSON.stringify(filtrarYPrepararDatos(filtros)))
-               
+
                 return response.json();
             } else {
                 console.log(JSON.stringify(filtrarYPrepararDatos(filtros)))
@@ -116,8 +116,8 @@ function realizarBusqueda(limit, offset) {
             }
         })
 
-  
-        
+
+
         .then(data => {
             // console.log(data); // Imprimir para depuración
 
@@ -130,7 +130,7 @@ function realizarBusqueda(limit, offset) {
 
 
 // función para buscar citas por fecha
-function buscarCita(id,fecha,paciente_id,medico_id) {
+function buscarCita(id, fecha, paciente_id, medico_id) {
     // Captura del token de la sesión
     let token = sessionStorage.getItem('token_hospital_gest');
 
@@ -141,7 +141,7 @@ function buscarCita(id,fecha,paciente_id,medico_id) {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token  // Token real aquí
         },
-        body: JSON.stringify({id: id, fecha: fecha, paciente_id: paciente_id, medico_id: medico_id })
+        body: JSON.stringify({ id: id, fecha: fecha, paciente_id: paciente_id, medico_id: medico_id })
     })
         .then(response => {
             if (response.headers.get("content-type").includes("application/json")) {
@@ -151,7 +151,7 @@ function buscarCita(id,fecha,paciente_id,medico_id) {
             }
         })
         .then(data => {
-            // console.log(data); // Imprimir para depuración
+
             mostrarCitas(data);
             return data;
         })
@@ -187,7 +187,7 @@ function mostrarCitas(respuesta) {
     tabla.classList.add('table');
 
 
-// si la respuesta es correcta y el array no esta vacio
+    // si la respuesta es correcta y el array no esta vacio
 
     if (respuesta && Array.isArray(respuesta.data)) {
         respuesta.data.forEach(cita => {
@@ -303,7 +303,7 @@ function editarCita(id) {
                 let fecha = document.getElementById('fecha').value;
                 let paciente_id = document.getElementById('paciente_id').value;
                 let medico_id = document.getElementById('medico_id').value;
-                guardarCita(id,fecha, paciente_id, medico_id);
+                guardarCita(id, fecha, paciente_id, medico_id);
             };
 
             // botón de cancelar
@@ -338,7 +338,7 @@ function editarCita(id) {
 
 // Guardar Cita, también se usa para insertar
 
-function guardarCita(id,fecha, paciente_id, medico_id) {
+function guardarCita(id, fecha, paciente_id, medico_id) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
     let url = 'webservice/wscitas.php'; // webserice url
@@ -353,7 +353,7 @@ function guardarCita(id,fecha, paciente_id, medico_id) {
         },
         body: JSON.stringify(data)
 
-           
+
 
     })
         .then(response => {
@@ -440,7 +440,7 @@ function borrarCita(id) {
             // Aquí puedes añadir código para actualizar la interfaz de usuario, como quitar la fila de la tabla
         })
         .catch(error => {
-            // console.error('Error al borrar Cita:', error);
+
             // Manejo de errores, como mostrar un mensaje al usuario
         });
 }

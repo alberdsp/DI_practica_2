@@ -40,7 +40,7 @@
     $sql = "SELECT numero_colegiado, dni, nombre, apellido1 FROM medicos";
     $parametros = [];
 
-    // Create a separate SQL query to get the total count of records
+    // Creamos una consulta separada para obtener el total de registros
     $sqlCount = "SELECT COUNT(*) FROM medicos";
 
     if (!empty($filtros)) {
