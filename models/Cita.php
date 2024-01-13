@@ -20,8 +20,6 @@ class Cita
             $this->medico_id = $medico_id;
             $this->paciente_id = $paciente_id;
         }
-          
-
     }
 
 
@@ -32,7 +30,7 @@ class Cita
 
 
 
-    
+
     public static function obtenerCitas($pdo, $filtros = [])
     {
         $sql = "SELECT id, fecha, paciente_id, medico_id FROM citas";
@@ -55,77 +53,74 @@ class Cita
             }
         }
 
-            // Hacemos la consulta para obtener el total de registros
-    $stmtCount = $pdo->prepare($sqlCount);
-    $stmtCount->execute($parametros);
-    $regCount = $stmtCount->fetchColumn();
+        // Hacemos la consulta para obtener el total de registros
+        $stmtCount = $pdo->prepare($sqlCount);
+        $stmtCount->execute($parametros);
+        $regCount = $stmtCount->fetchColumn();
 
-    
- 
-    // limitamos los resultados si se proporcionan los parámetros limit y offset
-    $limit = isset($filtros['limit']) ? $filtros['limit'] : 10;
-    $offset = isset($filtros['offset']) ? $filtros['offset'] : 0;
 
-    // añadimos limit y offset a la consulta
-    $sql .= " LIMIT $limit OFFSET $offset";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($parametros);
+        // limitamos los resultados si se proporcionan los parámetros limit y offset
+        $limit = isset($filtros['limit']) ? $filtros['limit'] : 10;
+        $offset = isset($filtros['offset']) ? $filtros['offset'] : 0;
+
+        // añadimos limit y offset a la consulta
+        $sql .= " LIMIT $limit OFFSET $offset";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($parametros);
         // Fech los resultados
-      //  $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $citas = $stmt->fetchAll(PDO::FETCH_CLASS, 'Cita');    
+        //  $citas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $citas = $stmt->fetchAll(PDO::FETCH_CLASS, 'Cita');
         // Obtener el total de registros
-      //  $stmt = $pdo->prepare($sqlCount);
-     //   $stmt->execute($parametros);
-     
+        //  $stmt = $pdo->prepare($sqlCount);
+        //   $stmt->execute($parametros);
+
         return ['citas' => $citas, 'regCount' => $regCount];
     }
 
 
 
 
-    
+
     // Elimitar una cita de la base de datos
     public static function eliminar($pdo, $id)
     {
-  
-           // preparamos la transacción
-           $pdo->beginTransaction();
+
+        // preparamos la transacción
+        $pdo->beginTransaction();
 
 
-           try {
-   
-               // consultamos el si id de la cita existe
-               $sql = "SELECT id FROM citas WHERE id = ?";
-               $stmt = $pdo->prepare($sql);
-               $stmt->execute([$id]);
-               $objcita = $stmt->fetch(PDO::FETCH_ASSOC);
-   
-               if ($objcita) {
-   
-                   // borramos los tratamientos de cada cita del medico
-                   $sql = "DELETE FROM tratamientos WHERE cita_id = ?";
-                   $stmt = $pdo->prepare($sql);
-                   $stmt->execute([$objcita['id']]);
-   
-                   // borramos la cita
-                   $sql = "DELETE FROM citas WHERE id = ?";
-                   $stmt = $pdo->prepare($sql);
-                   $stmt->execute([$id]);
-                   $pdo->commit();
-                   return $stmt->rowCount() > 0;
-               } else {
-                   throw new Exception("La cita no existe.");
-               }
-           } catch (Exception $e) {
-               // ocurrió error, hacemos roll back de la transacción
-               $pdo->rollBack();
-               throw $e;
-           }
+        try {
+
+            // consultamos el si id de la cita existe
+            $sql = "SELECT id FROM citas WHERE id = ?";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$id]);
+            $objcita = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($objcita) {
+
+                // borramos los tratamientos de cada cita del medico
+                $sql = "DELETE FROM tratamientos WHERE cita_id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$objcita['id']]);
+
+                // borramos la cita
+                $sql = "DELETE FROM citas WHERE id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$id]);
+                $pdo->commit();
+                return $stmt->rowCount() > 0;
+            } else {
+                throw new Exception("La cita no existe.");
+            }
+        } catch (Exception $e) {
+            // ocurrió error, hacemos roll back de la transacción
+            $pdo->rollBack();
+            throw $e;
+        }
     }
-
-    
-
 
 
 
@@ -137,30 +132,36 @@ class Cita
         // preparamos la transacción
         $pdo->beginTransaction();
 
+
+
+
+
         try {
 
             // consultamos si la cita existe
             $sql = "SELECT id FROM citas WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$cita->dni]);
+            $stmt->execute([$cita->id]);
             $objcita = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($objcita) {
 
-                if (empty($cita->dni)) {
-                    throw new Exception("El DNI es obligatorio para actualizar.");
-                }
-
-                $sql = "UPDATE citas SET numero_colegiado = ?, nombre = ?, apellido1 = ? WHERE dni = ?";
+                echo var_dump($objcita);
+                echo var_dump($cita);
+                // actualizamos la cita
+                $sql = "UPDATE citas SET fecha = ?, paciente_id = ?, medico_id = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$cita->numero_colegiado, $cita->nombre, $cita->apellido1, $cita->dni]);
+                $stmt->execute([$cita->fecha, $cita->paciente_id, $cita->medico_id, $cita->id]);
                 $pdo->commit();
                 return true;
             } else {
+
+
+
                 // si no existe el cita lo creamos
-                $sql = "INSERT INTO citas (numero_colegiado, dni, nombre, apellido1,especialidad_id) VALUES (?, ?, ?, ?, 1)";
+                $sql = "INSERT INTO citas (fecha, paciente_id, medico_id) VALUES (?, ?, ?,)";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$cita->numero_colegiado, $cita->dni, $cita->nombre, $cita->apellido1, $cita->especialidad_id]);
+                $stmt->execute([$cita->fecha, $cita->paciente_id, $cita->medico_id]);
                 $pdo->commit();
                 return  true;
             }
@@ -171,11 +172,19 @@ class Cita
         }
     }
 
+ // Convertir objeto a JSON
+ public function toJson()
+ {
+     return json_encode(get_object_vars($this));
+ }
+
+ // Crear un objeto Cita desde JSON
+ public static function fromJson($jsonString)
+ {
+     $data = json_decode($jsonString, true);
+     return new self($data['id'], $data['fecha'], $data['paciente_id'], $data['medico_id']);
+ }
 
 
 
-
-
-
-    
 }

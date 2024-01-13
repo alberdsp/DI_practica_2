@@ -328,7 +328,7 @@ function guardarPaciente(numero_colegiado, dni, nombre, apellido1) {
 
     let url = 'webservice/wsmedicos.php'; // webserice url
     let data = { numero_colegiado: numero_colegiado, dni: dni, nombre: nombre, apellido1: apellido1 };
-
+    console.log(data);
     fetch(url, {
         method: 'PUT',
         headers: {

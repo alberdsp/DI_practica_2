@@ -98,11 +98,20 @@ if ($autenticado) {
                 $data = json_decode(file_get_contents('php://input'), true);
 
 
+                    // comprobamos que recibimos el id de la cita a actualizar
+               
 
-                if (isset($data['fecha'])) {
+
+
+                      echo var_dump($data);
+
+
                     try {
+
+
+                        // si no hay id, creamos una cita nueva
+                        if (!isset($data['id'])) {
                         $cita = new Cita();
-                        $cita->id = isset($data['id']) ? $data['id'] : null;
                         $cita->fecha = $data['fecha'];
                         $cita->paciente_id = isset($data['paciente_id']) ? $data['paciente_id'] : null;
                         $cita->medico_id = isset($data['medico_id']) ? $data['medico_id'] : null;
@@ -110,14 +119,28 @@ if ($autenticado) {
                         $resultado = Cita::actualizar($pdo, $cita);
 
                         echo json_encode(['result' => $resultado]);
+
+                        }else{
+                            // si  hay id, actualizamos la cita
+                            $cita = new Cita();
+                            $cita->id = isset($data['id']) ? $data['id'] : null;
+                            $cita->fecha = $data['fecha'];
+                            $cita->paciente_id = isset($data['paciente_id']) ? $data['paciente_id'] : null;
+                            $cita->medico_id = isset($data['medico_id']) ? $data['medico_id'] : null;
+    
+                            $resultado = Cita::actualizar($pdo, $cita);
+    
+                            echo json_encode(['result' => $resultado]);
+                        }
+
+
+
+
                     } catch (Exception $e) {
                         error_log("Exception capturada Cita::actualizar: " . $e->getMessage());
                         throw $e;
                     }
-                } else {
-                    http_response_code(400);
-                    echo json_encode(['error' => 'fecha no proporcionado']);
-                }
+            
                 break;
 
 

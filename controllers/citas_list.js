@@ -48,25 +48,25 @@ document.getElementById('limpiar').addEventListener('click', (event) => {
 // listener para el boton de insertar
 document.getElementById('insertar').addEventListener('click', async (event) => {
     event.preventDefault();
-   // let id = document.getElementById('id').value;
+    let id = document.getElementById('id').value;
     let fecha = document.getElementById('fecha').value;
-    let paciente = document.getElementById('paciente').value;
-    let medico = document.getElementById('medico').value;
+    let paciente_id = document.getElementById('paciente_id').value;
+    let medico_id = document.getElementById('medico_id').value;
 
 
     // promesa asyncrona para recibir los datos si existe cita
-    let response = await buscarCita(fecha, paciente, medico);
+    let response = await buscarCita(id,fecha, paciente_id, medico_id);
 
     // si existe cita para ese paciente mostramos un mensaje de alerta
     if (response.data && response.data.length > 0) {
-        alert('El cita para este paciente ya existe');
+        alert('La cita para este paciente ya existe');
         // si hay campos vacios mostramos un mensaje de alerta
-    } else if (fecha == '' || paciente == '' || medico == '') {
+    } else if (fecha == '' || paciente_id == '' || medico_id == '') {
         alert('Debes rellenar todos los campos');
 
         // finalemnte si no existe el cita y los campos no estan vacios insertamos
     } else {
-        guardarCita(fecha, paciente, medico);
+        guardarCita(id,fecha, paciente_id, medico_id);
     }
 });
 
@@ -130,7 +130,7 @@ function realizarBusqueda(limit, offset) {
 
 
 // función para buscar citas por fecha
-function buscarCita(fecha) {
+function buscarCita(id,fecha,paciente_id,medico_id) {
     // Captura del token de la sesión
     let token = sessionStorage.getItem('token_hospital_gest');
 
@@ -141,7 +141,7 @@ function buscarCita(fecha) {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token  // Token real aquí
         },
-        body: JSON.stringify({ fecha: fecha })
+        body: JSON.stringify({id: id, fecha: fecha, paciente_id: paciente_id, medico_id: medico_id })
     })
         .then(response => {
             if (response.headers.get("content-type").includes("application/json")) {
@@ -179,7 +179,7 @@ function filtrarYPrepararDatos(objetoFiltros) {
 }
 
 function mostrarCitas(respuesta) {
-    const contenedor = document.getElementById('lista_medicos');
+    const contenedor = document.getElementById('lista_citas');
     contenedor.innerHTML = ''; // Limpiar el contenedor actual
 
     // Crear la tabla
@@ -207,9 +207,9 @@ function mostrarCitas(respuesta) {
             const botonEditar = document.createElement('button');
             botonEditar.innerText = 'Editar';
             botonEditar.classList.add('btn', 'btn-primary', 'mr-2');
-            botonEditar.setAttribute('data-fecha', cita.fecha);
+            botonEditar.setAttribute('data-id', cita.id);
             botonEditar.onclick = function () {
-                editarCita(this.getAttribute('data-fecha'));
+                editarCita(this.getAttribute('data-id'));
             };
 
             celdaBotones.appendChild(botonEditar);
@@ -270,7 +270,7 @@ function crearBoton(texto, clases, onClick) {
 function editarCita(id) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
-    fetch('webservice/wsmedicos.php', {
+    fetch('webservice/wscitas.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -290,8 +290,8 @@ function editarCita(id) {
             // Rellenamos el formulario con los datos del cita
             document.getElementById('id').value = data.data[0]['id'];
             document.getElementById('fecha').value = data.data[0]['fecha'];
-            document.getElementById('paciente').value = data.data[0]['paciente'];
-            document.getElementById('medico').value = data.data[0]['medico'];
+            document.getElementById('paciente_id').value = data.data[0]['paciente_id'];
+            document.getElementById('medico_id').value = data.data[0]['medico_id'];
 
             // botón de guardar
             let botonGuardar = document.createElement('button');
@@ -301,9 +301,9 @@ function editarCita(id) {
             botonGuardar.onclick = function () {
                 let id = document.getElementById('id').value;
                 let fecha = document.getElementById('fecha').value;
-                let paciente = document.getElementById('paciente').value;
-                let medico = document.getElementById('medico').value;
-                guardarCita(fecha, paciente, medico);
+                let paciente_id = document.getElementById('paciente_id').value;
+                let medico_id = document.getElementById('medico_id').value;
+                guardarCita(id,fecha, paciente_id, medico_id);
             };
 
             // botón de cancelar
@@ -338,12 +338,13 @@ function editarCita(id) {
 
 // Guardar Cita, también se usa para insertar
 
-function guardarCita(fecha, paciente, medico) {
+function guardarCita(id,fecha, paciente_id, medico_id) {
     let token = sessionStorage.getItem('token_hospital_gest');
 
     let url = 'webservice/wscitas.php'; // webserice url
-    let data = { id: id, fecha: fecha, paciente: paciente, medico: medico };
+    let data = { id: id, fecha: fecha, paciente_id: paciente_id, medico_id: medico_id };
 
+    console.log(" los datos pasado son " + JSON.stringify(data));
     fetch(url, {
         method: 'PUT',
         headers: {
@@ -351,6 +352,9 @@ function guardarCita(fecha, paciente, medico) {
             'Authorization': 'Bearer ' + token // aquí  va el token
         },
         body: JSON.stringify(data)
+
+           
+
     })
         .then(response => {
             if (!response.ok) {

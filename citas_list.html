@@ -84,14 +84,14 @@ $medico= '';
       <div class="lh-1">
         <form id='filtroForm' class="form">
           <label for="id"><Label>ID.</Label>:</label>
-          <input type="text" id="id" name="id" value="">
+          <input type="text" id="id" name="id" value="" disabled>
           <label for="fecha">Fecha:</label>
           <input type="datetime-local" id="fecha" name="fecha" value="">
           <label for="paciente">Paciente:</label>
-          <input type="text" id="paciente" name="paciente_id" value="" list="paciente-list">
+          <input type="text" id="paciente_id" name="paciente_id" value="" list="paciente-list">
           <datalist id="paciente-list"></datalist>
           <label for="medico">Medico:</label>
-          <input type="text" id="medico" name="medico_id" value="">
+          <input type="text" id="medico_id" name="medico_id" value="">
           <button class="btn btn-primary mr-2" type="submit" id="buscar">Buscar</button>
           <button class="btn btn-success text-light mr-2" type="insertar" id="insertar">Insertar</button>
           <button class="btn btn-warning mr-2" type="limpiar" id="limpiar">Limpiar</button>
@@ -99,11 +99,11 @@ $medico= '';
       </div>
     </div>
 
-    <div id='lista_medicos' class="my-3 p-3 bg-body rounded shadow-sm">
+    <div id='lista_citas' class="my-3 p-3 bg-body rounded shadow-sm">
 
-      <!-- paciente del listado  -->
+      <!-- paciente cita del listado  -->
       <h6 class="border-bottom pb-2 mb-0">Listado de citas</h6>
-      <div id='lista_medicos2' class="d-flex text-body-secondary pt-3">
+      <div id='lista_citas2' class="d-flex text-body-secondary pt-3">
 
       </div>
 
